@@ -1,0 +1,2339 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador de Atendimento — Cresci e Perdi</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --verde: #2d6a4f;
+  --verde-claro: #52b788;
+  --verde-neon: #40c97a;
+  --amarelo: #f4a261;
+  --vermelho: #e63946;
+  --escuro: #0d1117;
+  --escuro2: #161b22;
+  --escuro3: #21262d;
+  --borda: #30363d;
+  --texto: #e6edf3;
+  --texto2: #8b949e;
+  --branco: #f0f6fc;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--escuro);
+  color: var(--texto);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── TELA INICIAL ─────────────────────────────── */
+#tela-inicio {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  position: relative;
+}
+
+#tela-inicio::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 20% 20%, rgba(45,106,79,.25) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 80% 80%, rgba(82,183,136,.12) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.inicio-card {
+  background: var(--escuro2);
+  border: 1px solid var(--borda);
+  border-radius: 24px;
+  padding: 3rem;
+  max-width: 560px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.inicio-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--verde), var(--verde-neon), var(--amarelo));
+}
+
+.logo-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 2.5rem;
+}
+
+.logo-icon {
+  width: 44px; height: 44px;
+  background: var(--verde);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem;
+}
+
+.logo-text {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--branco);
+  line-height: 1.2;
+}
+
+.logo-text span {
+  display: block;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400;
+  font-size: .72rem;
+  color: var(--texto2);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.inicio-card h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: .75rem;
+  background: linear-gradient(135deg, var(--branco) 40%, var(--verde-claro));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.inicio-card p {
+  color: var(--texto2);
+  font-size: .95rem;
+  line-height: 1.7;
+  margin-bottom: 2rem;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .75rem;
+  margin-bottom: 2rem;
+}
+
+.info-item {
+  background: var(--escuro3);
+  border: 1px solid var(--borda);
+  border-radius: 12px;
+  padding: .9rem 1rem;
+}
+
+.info-item .label {
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--texto2);
+  margin-bottom: .25rem;
+}
+
+.info-item .valor {
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--branco);
+}
+
+.campo-grupo { margin-bottom: 1rem; }
+.campo-grupo label {
+  display: block;
+  font-size: .75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--texto2);
+  margin-bottom: .5rem;
+}
+.campo-grupo input {
+  width: 100%;
+  padding: .85rem 1rem;
+  background: var(--escuro3);
+  border: 1px solid var(--borda);
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .95rem;
+  color: var(--texto);
+  outline: none;
+  transition: border-color .2s;
+}
+.campo-grupo input:focus { border-color: var(--verde-claro); }
+.campo-grupo input::placeholder { color: var(--texto2); }
+
+.btn-comecar {
+  width: 100%;
+  padding: 1rem;
+  background: var(--verde);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-family: 'Syne', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: .03em;
+  transition: all .2s;
+  margin-top: .5rem;
+}
+.btn-comecar:hover { background: #1e4d38; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(45,106,79,.4); }
+
+.erro-msg { color: var(--vermelho); font-size: .82rem; margin-top: .4rem; display: none; }
+
+/* ── TELA SIMULADOR ───────────────────────────── */
+#tela-simulador { display: none; min-height: 100vh; }
+
+.sim-header {
+  background: var(--escuro2);
+  border-bottom: 1px solid var(--borda);
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.sim-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.sim-logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--verde-claro);
+}
+
+.sim-usuario {
+  font-size: .82rem;
+  color: var(--texto2);
+}
+
+.sim-usuario strong { color: var(--texto); }
+
+.sim-progresso-wrap {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.sim-caso-label {
+  font-size: .8rem;
+  color: var(--texto2);
+  white-space: nowrap;
+}
+
+.sim-caso-label strong {
+  color: var(--verde-neon);
+  font-family: 'Syne', sans-serif;
+  font-size: 1rem;
+}
+
+.barra-topo {
+  height: 3px;
+  background: var(--escuro3);
+}
+
+.barra-topo-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--verde), var(--verde-neon));
+  transition: width .5s ease;
+}
+
+/* ── LAYOUT DO SIMULADOR ─────────────────────── */
+.sim-body {
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  min-height: calc(100vh - 61px);
+}
+
+/* Painel esquerdo: chat */
+.painel-chat {
+  border-right: 1px solid var(--borda);
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-topbar {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--borda);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.franqueado-avatar {
+  width: 40px; height: 40px;
+  background: linear-gradient(135deg, var(--verde), var(--verde-claro));
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700;
+  font-size: .9rem;
+  color: white;
+  flex-shrink: 0;
+}
+
+.franqueado-info .nome {
+  font-weight: 600;
+  font-size: .9rem;
+  color: var(--branco);
+}
+
+.franqueado-info .cidade {
+  font-size: .75rem;
+  color: var(--texto2);
+}
+
+.status-badge {
+  margin-left: auto;
+  background: rgba(64,201,122,.15);
+  color: var(--verde-neon);
+  border: 1px solid rgba(64,201,122,.3);
+  border-radius: 100px;
+  padding: .2rem .7rem;
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: .05em;
+}
+
+.chat-mensagens {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-height: 300px;
+  max-height: 420px;
+}
+
+.msg {
+  display: flex;
+  gap: .75rem;
+  animation: fadeSlide .3s ease;
+}
+
+@keyframes fadeSlide {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.msg.franqueado { align-items: flex-start; }
+.msg.sistema { align-items: flex-start; flex-direction: row-reverse; }
+.msg.sistema .msg-avatar { background: var(--verde); }
+
+.msg-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--escuro3);
+  border: 1px solid var(--borda);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  color: var(--branco);
+}
+
+.msg-balao {
+  background: var(--escuro3);
+  border: 1px solid var(--borda);
+  border-radius: 0 14px 14px 14px;
+  padding: .75rem 1rem;
+  max-width: 85%;
+  font-size: .88rem;
+  line-height: 1.55;
+  color: var(--texto);
+}
+
+.msg.sistema .msg-balao {
+  background: rgba(45,106,79,.2);
+  border-color: rgba(82,183,136,.3);
+  border-radius: 14px 0 14px 14px;
+  color: var(--verde-claro);
+}
+
+.msg-hora {
+  font-size: .65rem;
+  color: var(--texto2);
+  margin-top: .3rem;
+}
+
+.digitando {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: .6rem .8rem;
+}
+
+.digitando span {
+  width: 6px; height: 6px;
+  background: var(--texto2);
+  border-radius: 50%;
+  animation: bounce .9s infinite;
+}
+
+.digitando span:nth-child(2) { animation-delay: .15s; }
+.digitando span:nth-child(3) { animation-delay: .3s; }
+
+@keyframes bounce {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-6px); }
+}
+
+/* Painel direito: decisão */
+.painel-decisao {
+  display: flex;
+  flex-direction: column;
+  background: var(--escuro2);
+}
+
+.decisao-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--borda);
+}
+
+.fase-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(244,162,97,.12);
+  border: 1px solid rgba(244,162,97,.3);
+  color: var(--amarelo);
+  border-radius: 100px;
+  padding: .25rem .75rem;
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  margin-bottom: .75rem;
+}
+
+.decisao-titulo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--branco);
+  margin-bottom: .4rem;
+}
+
+.decisao-sub {
+  font-size: .8rem;
+  color: var(--texto2);
+  line-height: 1.5;
+}
+
+.decisao-corpo {
+  flex: 1;
+  padding: 1.25rem 1.5rem;
+  overflow-y: auto;
+}
+
+.opcoes-lista {
+  display: flex;
+  flex-direction: column;
+  gap: .6rem;
+}
+
+.opcao-btn {
+  width: 100%;
+  text-align: left;
+  background: var(--escuro3);
+  border: 1.5px solid var(--borda);
+  border-radius: 12px;
+  padding: .85rem 1rem;
+  color: var(--texto);
+  font-family: 'DM Sans', sans-serif;
+  font-size: .85rem;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: all .2s;
+  display: flex;
+  align-items: flex-start;
+  gap: .75rem;
+}
+
+.opcao-btn:hover:not(:disabled) {
+  border-color: var(--verde-claro);
+  background: rgba(82,183,136,.07);
+}
+
+.opcao-letra {
+  width: 24px; height: 24px;
+  border-radius: 6px;
+  background: var(--escuro);
+  border: 1.5px solid var(--borda);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700;
+  font-size: .72rem;
+  color: var(--texto2);
+  flex-shrink: 0;
+  transition: all .2s;
+}
+
+.opcao-btn:hover:not(:disabled) .opcao-letra {
+  border-color: var(--verde-claro);
+  color: var(--verde-claro);
+}
+
+.opcao-btn.certa {
+  border-color: var(--verde-neon) !important;
+  background: rgba(64,201,122,.1) !important;
+}
+
+.opcao-btn.certa .opcao-letra {
+  background: var(--verde-neon);
+  border-color: var(--verde-neon);
+  color: #0d1117;
+}
+
+.opcao-btn.errada {
+  border-color: var(--vermelho) !important;
+  background: rgba(230,57,70,.08) !important;
+}
+
+.opcao-btn.errada .opcao-letra {
+  background: var(--vermelho);
+  border-color: var(--vermelho);
+  color: white;
+}
+
+.opcao-btn.mostrar-certa {
+  border-color: var(--verde-neon) !important;
+  background: rgba(64,201,122,.06) !important;
+}
+
+.opcao-btn.mostrar-certa .opcao-letra {
+  border-color: var(--verde-neon);
+  color: var(--verde-neon);
+}
+
+.opcao-btn:disabled { cursor: default; }
+
+/* Feedback box */
+.feedback-box {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid;
+  font-size: .82rem;
+  line-height: 1.6;
+  display: none;
+  animation: fadeSlide .3s ease;
+}
+
+.feedback-box.certo {
+  background: rgba(64,201,122,.08);
+  border-color: rgba(64,201,122,.3);
+  color: #6ee7a0;
+}
+
+.feedback-box.errado {
+  background: rgba(230,57,70,.08);
+  border-color: rgba(230,57,70,.3);
+  color: #f87171;
+}
+
+.feedback-titulo {
+  font-weight: 700;
+  margin-bottom: .35rem;
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+}
+
+/* Pontuação inline */
+.pontos-flash {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: .8rem;
+  padding: .2rem .6rem;
+  border-radius: 100px;
+  margin-left: .5rem;
+}
+
+.pontos-flash.mais { background: rgba(64,201,122,.2); color: var(--verde-neon); }
+.pontos-flash.zero { background: rgba(230,57,70,.2); color: #f87171; }
+
+/* Botão próximo */
+.btn-proximo {
+  margin: 1rem 1.5rem 1.5rem;
+  width: calc(100% - 3rem);
+  padding: .85rem;
+  background: var(--verde);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: .9rem;
+  cursor: pointer;
+  transition: all .2s;
+  display: none;
+}
+
+.btn-proximo:hover { background: #1e4d38; }
+
+/* Placar lateral */
+.placar-row {
+  padding: .75rem 1.5rem;
+  border-top: 1px solid var(--borda);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.placar-item { text-align: center; }
+.placar-item .num {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.placar-item .num.verde { color: var(--verde-neon); }
+.placar-item .num.vermelho { color: var(--vermelho); }
+.placar-item .num.amarelo { color: var(--amarelo); }
+
+.placar-item .lab {
+  font-size: .65rem;
+  color: var(--texto2);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  margin-top: 2px;
+}
+
+/* ── TELA RESULTADO ───────────────────────────── */
+#tela-resultado { display: none; min-height: 100vh; }
+
+.resultado-wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  position: relative;
+}
+
+.resultado-wrap::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 50% 40% at 50% 0%, rgba(45,106,79,.2) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.resultado-card {
+  background: var(--escuro2);
+  border: 1px solid var(--borda);
+  border-radius: 24px;
+  padding: 2.5rem;
+  max-width: 640px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.resultado-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--verde), var(--verde-neon), var(--amarelo));
+}
+
+.resultado-icone { font-size: 3.5rem; margin-bottom: 1rem; text-align: center; }
+
+.resultado-card h2 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 1.8rem;
+  text-align: center;
+  margin-bottom: .5rem;
+  background: linear-gradient(135deg, var(--branco), var(--verde-claro));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.resultado-sub {
+  text-align: center;
+  color: var(--texto2);
+  font-size: .9rem;
+  margin-bottom: 2rem;
+}
+
+.nota-grande {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 4.5rem;
+  text-align: center;
+  line-height: 1;
+  margin-bottom: .5rem;
+}
+
+.nota-grande.aprovado { color: var(--verde-neon); }
+.nota-grande.medio { color: var(--amarelo); }
+.nota-grande.reprovado { color: var(--vermelho); }
+
+.status-pill-res {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.status-pill-res span {
+  padding: .35rem 1.2rem;
+  border-radius: 100px;
+  font-weight: 700;
+  font-size: .8rem;
+  letter-spacing: .04em;
+}
+
+.status-pill-res span.aprovado { background: rgba(64,201,122,.15); color: var(--verde-neon); border: 1px solid rgba(64,201,122,.3); }
+.status-pill-res span.medio { background: rgba(244,162,97,.15); color: var(--amarelo); border: 1px solid rgba(244,162,97,.3); }
+.status-pill-res span.reprovado { background: rgba(230,57,70,.15); color: #f87171; border: 1px solid rgba(230,57,70,.3); }
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: .75rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-item {
+  background: var(--escuro3);
+  border: 1px solid var(--borda);
+  border-radius: 14px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.stat-item .num {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 1.8rem;
+  line-height: 1;
+  color: var(--branco);
+}
+
+.stat-item .lab {
+  font-size: .7rem;
+  color: var(--texto2);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  margin-top: 4px;
+}
+
+/* Breakdown por caso */
+.breakdown {
+  background: var(--escuro3);
+  border: 1px solid var(--borda);
+  border-radius: 14px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.breakdown h3 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: .85rem;
+  color: var(--texto2);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin-bottom: 1rem;
+}
+
+.caso-linha {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  margin-bottom: .6rem;
+}
+
+.caso-linha:last-child { margin-bottom: 0; }
+
+.caso-nome {
+  font-size: .82rem;
+  color: var(--texto);
+  flex: 1;
+}
+
+.caso-stars {
+  display: flex;
+  gap: 3px;
+}
+
+.star {
+  width: 14px; height: 14px;
+  border-radius: 3px;
+}
+
+.star.cheia { background: var(--verde-neon); }
+.star.vazia { background: var(--escuro); border: 1px solid var(--borda); }
+
+.pontos-caso {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: .8rem;
+  color: var(--texto2);
+  min-width: 40px;
+  text-align: right;
+}
+
+/* Mensagem gestor */
+.msg-gestor {
+  background: rgba(45,106,79,.12);
+  border: 1px solid rgba(82,183,136,.2);
+  border-radius: 14px;
+  padding: 1.25rem;
+  font-size: .85rem;
+  line-height: 1.65;
+  color: var(--verde-claro);
+  margin-bottom: 1.5rem;
+}
+
+.msg-gestor strong { color: var(--branco); }
+
+.btn-finalizar-res {
+  width: 100%;
+  padding: .9rem;
+  background: var(--verde);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: .95rem;
+  cursor: pointer;
+  transition: all .2s;
+}
+
+.btn-finalizar-res:hover { background: #1e4d38; }
+
+@media (max-width: 768px) {
+  .sim-body { grid-template-columns: 1fr; }
+  .painel-chat { border-right: none; border-bottom: 1px solid var(--borda); }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════
+     TELA 1 — IDENTIFICAÇÃO
+══════════════════════════════════════════════ -->
+<div id="tela-inicio">
+  <div class="inicio-card">
+    <div class="logo-row">
+      <div class="logo-icon">👕</div>
+      <div class="logo-text">
+        Cresci e Perdi
+        <span>Simulador de Atendimento</span>
+      </div>
+    </div>
+
+    <h1>Simulador<br>Concierge</h1>
+    <p>Você vai enfrentar <strong>15 casos reais</strong> de atendimento ao franqueado — situações críticas, cotidianas e hipotéticas. Além de múltipla escolha, algumas fases exigem que você <strong>escreva a resposta</strong>, que será avaliada por IA em conteúdo, tom e português.</p>
+
+    <div class="info-grid">
+      <div class="info-item">
+        <div class="label">Casos</div>
+        <div class="valor">15 situações reais</div>
+      </div>
+      <div class="info-item">
+        <div class="label">Fases por caso</div>
+        <div class="valor">3 decisões</div>
+      </div>
+      <div class="info-item">
+        <div class="label">Pontuação máx.</div>
+        <div class="valor">450 pontos</div>
+      </div>
+      <div class="info-item">
+        <div class="label">Aprovação</div>
+        <div class="valor">≥ 70% (315 pts)</div>
+      </div>
+    </div>
+
+    <div class="campo-grupo">
+      <label>Seu nome completo</label>
+      <input type="text" id="input-nome" placeholder="Digite seu nome..." autocomplete="off">
+      <div class="erro-msg" id="erro-nome">Por favor, informe seu nome.</div>
+    </div>
+
+    <button class="btn-comecar" onclick="iniciarSimulador()">Iniciar Simulador →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     TELA 2 — SIMULADOR
+══════════════════════════════════════════════ -->
+<div id="tela-simulador">
+  <div class="sim-header">
+    <div class="sim-header-left">
+      <div class="sim-logo">👕 Concierge</div>
+      <div class="sim-usuario">Atendente: <strong id="sim-nome">—</strong></div>
+    </div>
+    <div class="sim-progresso-wrap">
+      <div class="sim-caso-label">Caso <strong id="sim-caso-num">1</strong> de 15</div>
+    </div>
+  </div>
+  <div class="barra-topo"><div class="barra-topo-fill" id="barra-fill" style="width:0%"></div></div>
+
+  <div class="sim-body">
+    <!-- Painel chat -->
+    <div class="painel-chat">
+      <div class="chat-topbar">
+        <div class="franqueado-avatar" id="chat-avatar">?</div>
+        <div class="franqueado-info">
+          <div class="nome" id="chat-nome-franqueado">—</div>
+          <div class="cidade" id="chat-cidade">—</div>
+        </div>
+        <div class="status-badge">● Ao vivo</div>
+      </div>
+      <div class="chat-mensagens" id="chat-mensagens"></div>
+    </div>
+
+    <!-- Painel decisão -->
+    <div class="painel-decisao">
+      <div class="decisao-header">
+        <div class="fase-pill" id="fase-pill">Fase 1 — Triagem</div>
+        <div class="decisao-titulo" id="decisao-titulo">O que você faz?</div>
+        <div class="decisao-sub" id="decisao-sub">Leia a mensagem e decida como agir.</div>
+      </div>
+
+      <div class="decisao-corpo">
+        <div class="opcoes-lista" id="opcoes-lista"></div>
+        <div class="feedback-box" id="feedback-box">
+          <div class="feedback-titulo" id="feedback-titulo"></div>
+          <div id="feedback-texto"></div>
+        </div>
+      </div>
+
+      <button class="btn-proximo" id="btn-proximo" onclick="proximaFase()">Continuar →</button>
+
+      <div class="placar-row">
+        <div class="placar-item">
+          <div class="num verde" id="placar-acertos">0</div>
+          <div class="lab">Acertos</div>
+        </div>
+        <div class="placar-item">
+          <div class="num vermelho" id="placar-erros">0</div>
+          <div class="lab">Erros</div>
+        </div>
+        <div class="placar-item">
+          <div class="num amarelo" id="placar-pontos">0</div>
+          <div class="lab">Pontos</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     TELA 3 — RESULTADO
+══════════════════════════════════════════════ -->
+<div id="tela-resultado">
+  <div class="resultado-wrap">
+    <div class="resultado-card">
+      <div class="resultado-icone" id="res-icone">🎯</div>
+      <h2 id="res-titulo">Simulação Concluída!</h2>
+      <div class="resultado-sub" id="res-sub">Resultado registrado com sucesso.</div>
+      <div class="nota-grande" id="res-nota">—</div>
+      <div class="status-pill-res"><span id="res-pill">—</span></div>
+
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="num" id="res-acertos">—</div>
+          <div class="lab">Acertos</div>
+        </div>
+        <div class="stat-item">
+          <div class="num" id="res-erros">—</div>
+          <div class="lab">Erros</div>
+        </div>
+        <div class="stat-item">
+          <div class="num" id="res-pontos">—</div>
+          <div class="lab">Pontos</div>
+        </div>
+      </div>
+
+      <div class="breakdown">
+        <h3>Desempenho por caso</h3>
+        <div id="breakdown-lista"></div>
+      </div>
+
+      <div class="msg-gestor" id="msg-gestor">—</div>
+
+      <button class="btn-finalizar-res" onclick="window.location.reload()">Refazer Simulação</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════════ -->
+// ─── BANCO DE CASOS (15 casos) ────────────────────────────────────────────
+// Tipos de fase: 'triagem' | 'resposta' | 'complicacao' | 'escrita'
+// Fase 'escrita': o colaborador digita a resposta e a IA avalia
+
+const CASOS = [
+
+  // ══════════════════════════════════════════════════════════
+  // CASO 1 — DFCOM travado (crítico / operacional)
+  // ══════════════════════════════════════════════════════════
+  {
+    id: 1,
+    franqueado: { nome: 'Fernanda Oliveira', cidade: 'Campinas — SP', avatar: 'FO' },
+    fases: [
+      {
+        tipo: 'triagem',
+        pill: 'Fase 1 — Triagem',
+        titulo: 'Para onde você direciona essa demanda?',
+        sub: 'Classifique e direcione corretamente.',
+        mensagem: 'Oi! Meu sistema de avaliação não abre. A tela fica carregando e trava. Tenho cliente esperando!',
+        opcoes: [
+          { letra: 'A', texto: 'Bug no GiraNet — ticket para equipe de Automação', certa: false },
+          { letra: 'B', texto: 'Problema no DFCOM — acionar pelo ícone de impressora no app ou WhatsApp "Olá Robô → Suporte Imediato DFcom"', certa: true },
+          { letra: 'C', texto: 'Emergência operacional — escalar imediatamente ao coordenador', certa: false },
+          { letra: 'D', texto: 'Dúvida operacional — o Concierge resolve diretamente', certa: false }
+        ],
+        feedback_certo: 'Correto! Sistema de avaliação de produtos é responsabilidade da DFCOM. O GiraNet/Automação cuida de bugs da plataforma de tickets e comunicados — não do sistema operacional da loja.',
+        feedback_errado: 'Sistema de avaliação de produtos = DFCOM. O GiraNet/Automação cuida de bugs da plataforma de tickets, comunicados e eventos — não do sistema operacional da loja.',
+        resposta_sistema: 'Fernanda, para esse problema você precisa acionar a DFCOM diretamente. No app GiraNet, na barra inferior, procure o ícone de impressora "DFCOM". Alternativamente: WhatsApp → "Olá Robô" → "Suporte Imediato DFcom". Eles vão te ajudar agora! 🙂'
+      },
+      {
+        tipo: 'escrita',
+        pill: 'Fase 2 — Resposta Livre',
+        titulo: 'Escreva a mensagem para a franqueada',
+        sub: 'Ela diz: "Já tentei a DFCOM e ninguém atende. Vocês não podem resolver aqui mesmo?" — Escreva sua resposta completa como se fosse mandar no WhatsApp.',
+        mensagem: 'Já tentei a DFCOM e ninguém atende. Vocês não podem resolver aqui mesmo? Tô perdendo venda!',
+        campo_label: 'Sua resposta para a Fernanda:',
+        campo_placeholder: 'Escreva aqui como responderia...',
+        avaliacao_prompt: `Você é um supervisor de qualidade de atendimento da Cresci e Perdi avaliando um colaborador em treinamento. O colaborador escreveu a seguinte resposta para uma franqueada que disse que a DFCOM não atende e quer que o Concierge resolva o problema do sistema de avaliação:
+
+RESPOSTA DO COLABORADOR: "{resposta}"
+
+Avalie em 3 critérios (pontue cada um de 0 a 10):
+1. CONTEÚDO: a resposta explica claramente o limite do Concierge, oferece alternativa concreta e não promete o que não pode?
+2. TOM: é empático, profissional, sem ser frio nem informal demais?
+3. PORTUGUÊS: gramática, concordância e clareza estão adequadas para comunicação profissional?
+
+Responda APENAS em JSON válido neste formato exato:
+{"conteudo": número, "tom": número, "portugues": número, "feedback": "texto de até 3 linhas com o que foi bem e o que melhorar", "aprovado": true ou false}
+
+Aprovado se média dos 3 critérios for >= 6.`,
+        resposta_sistema: 'Fernanda, entendo que é frustrante! O Concierge não tem acesso ao sistema DFCOM para resolver diretamente — esse sistema é independente. Mas vou registrar essa dificuldade agora. Enquanto isso, tente: GiraNet → ícone DFCOM na barra inferior, ou mande "Suporte Imediato DFcom" no seu grupo de WhatsApp. Vou acompanhar aqui! 💚'
+      },
+      {
+        tipo: 'complicacao',
+        pill: 'Fase 3 — Complicação',
+        titulo: 'A franqueada ameaça postar nas redes. Como agir?',
+        sub: 'Situação escalou. Mantenha o protocolo.',
+        mensagem: 'Absurdo! Vou postar no meu Instagram falando que o suporte da Cresci e Perdi não funciona!',
+        opcoes: [
+          { letra: 'A', texto: 'Pedir desculpas excessivamente e prometer resolver imediatamente', certa: false },
+          { letra: 'B', texto: 'Informar que ameaças podem gerar advertência contratual', certa: false },
+          { letra: 'C', texto: 'Manter calma, registrar tudo no ticket, escalar ao coordenador (ameaça pública = escalada imediata) e continuar com tom profissional sem fazer promessas', certa: true },
+          { letra: 'D', texto: 'Encerrar o atendimento pois o franqueado está sendo agressivo', certa: false }
+        ],
+        feedback_certo: 'Ameaça de postagem pública = escalada imediata ao coordenador + equipe de Marketing. Registrar tudo, manter tom profissional, nunca fazer promessas sob pressão, nunca encerrar o atendimento.',
+        feedback_errado: 'Ameaça de crise pública exige escalada imediata ao coordenador e Marketing. O analista registra tudo, mantém o tom profissional e NÃO faz promessas nem encerra o atendimento.',
+        resposta_sistema: 'Fernanda, entendo a pressão. Vou registrar essa ocorrência agora e acionar a equipe responsável com prioridade. Enquanto aguarda, oriente registrar o desapego manualmente para processar quando o sistema voltar. Estamos junto! 🙏'
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════
+  // CASO 2 — RENOVAÇÃO DE CONTRATO (jurídico / cotidiano)
+  // ══════════════════════════════════════════════════════════
+  {
+    id: 2,
+    franqueado: { nome: 'Marcos Ribeiro', cidade: 'Ribeirão Preto — SP', avatar: 'MR' },
+    fases: [
+      {
+        tipo: 'triagem',
+        pill: 'Fase 1 — Triagem',
+        titulo: 'Para onde você direciona essa demanda?',
+        sub: 'Identifique o canal e a equipe corretos.',
+        mensagem: 'Boa tarde! Meu contrato vence daqui a 8 meses. Ele renova automaticamente ou preciso fazer algo?',
+        opcoes: [
+          { letra: 'A', texto: 'O Concierge responde: a renovação é automática se o franqueado estiver em dia', certa: false },
+          { letra: 'B', texto: 'Escalar para o Jurídico sem informar o franqueado sobre a urgência', certa: false },
+          { letra: 'C', texto: 'Informar que a renovação NÃO é automática e deve ser iniciada com pelo menos 6 meses de antecedência — orientar ticket para Secretaria ou Expansão agora', certa: true },
+          { letra: 'D', texto: 'Dizer que ainda há tempo e que a franqueadora vai entrar em contato quando for a hora', certa: false }
+        ],
+        feedback_certo: 'Correto! A renovação NUNCA é automática. Com 8 meses restantes, é a hora certa de iniciar o processo via ticket para Secretaria ou Expansão.',
+        feedback_errado: 'A renovação NÃO é automática. Com 8 meses restantes é urgente iniciar o processo — prazo mínimo é 6 meses. Dizer "vai entrar em contato na hora certa" é um erro grave que pode fazer o franqueado perder o prazo.',
+        resposta_sistema: 'Marcos, ótimo que você já está pensando nisso! O contrato NÃO renova automaticamente. Com 8 meses restantes, é a hora de iniciar o processo — o prazo mínimo é 6 meses de antecedência. Abra um ticket pelo GiraNet → Novo Ticket → descreva a situação → a IA vai direcionar para Secretaria ou Expansão.'
+      },
+      {
+        tipo: 'resposta',
+        pill: 'Fase 2 — Resposta',
+        titulo: 'Qual é o limite do que você pode responder?',
+        sub: 'O franqueado quer saber sobre cláusulas contratuais específicas.',
+        mensagem: 'E se eu não renovar, posso continuar operando com a marca por mais uns meses enquanto decido?',
+        opcoes: [
+          { letra: 'A', texto: '"Pode continuar por até 90 dias após o vencimento, mas precisa retirar a comunicação visual depois."', certa: false },
+          { letra: 'B', texto: '"Não posso dar interpretação jurídica sobre isso. Leve essa dúvida para o processo de renovação com a Secretaria/Expansão via ticket — está previsto em contrato."', certa: true },
+          { letra: 'C', texto: '"Na prática muitas lojas continuam por um tempo sem problema, mas juridicamente não é permitido."', certa: false },
+          { letra: 'D', texto: '"Isso depende da cláusula do seu contrato específico, que posso consultar agora para você."', certa: false }
+        ],
+        feedback_certo: 'Perfeito! O analista NUNCA dá interpretação jurídica. Mesmo sabendo a resposta, o protocolo é claro: reconhecer o limite e direcionar para quem tem autoridade.',
+        feedback_errado: 'Nunca dê interpretação jurídica. Dar uma resposta errada aqui pode comprometer o franqueado e a franqueadora legalmente. O analista direciona — quem responde é a equipe responsável.',
+        resposta_sistema: 'Marcos, essa é uma pergunta que envolve interpretação contratual — e não está no meu escopo dar essa orientação. Leve essa dúvida exatamente para o processo de renovação com Secretaria ou Expansão via ticket. Eles vão analisar seu contrato específico.'
+      },
+      {
+        tipo: 'complicacao',
+        pill: 'Fase 3 — Complicação',
+        titulo: 'O franqueado menciona intenção de encerrar. Como agir?',
+        sub: 'A conversa tomou outro rumo. Identifique o protocolo.',
+        mensagem: 'Na verdade, estou pensando em não renovar mesmo. Tô cansado, o negócio não tá indo bem.',
+        opcoes: [
+          { letra: 'A', texto: 'Tentar convencer o franqueado a não fechar com argumentos positivos sobre o negócio', certa: false },
+          { letra: 'B', texto: 'Registrar no ticket, escalar para Secretaria e Expansão em até 1 hora, tratar com empatia e discrição, sem tomar posição', certa: true },
+          { letra: 'C', texto: 'Encaminhar imediatamente para o Jurídico, pois é rescisão contratual', certa: false },
+          { letra: 'D', texto: 'Pedir os motivos detalhados para montar um relatório antes de escalar', certa: false }
+        ],
+        feedback_certo: 'Intenção de encerramento = escalada para Secretaria/Expansão em até 1 hora, com empatia e discrição. Não é papel do analista convencer nem questionar — e não é emergência imediata, mas é sensível.',
+        feedback_errado: 'Intenção de encerramento não é crise imediata, mas exige escalada rápida (<1h) para Secretaria/Expansão. O analista trata com respeito, registra tudo no ticket, e NÃO toma posição.',
+        resposta_sistema: 'Marcos, obrigado por ser transparente. Entendo que é um momento difícil. Vou registrar esse contato e acionar a equipe responsável para conversar com calma sobre os próximos passos. Estou à disposição para qualquer dúvida operacional enquanto isso. 🙏'
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════
+  // CASO 3 — VIGILÂNCIA SANITÁRIA (emergência real)
+  // ══════════════════════════════════════════════════════════
+  {
+    id: 3,
+    franqueado: { nome: 'Patrícia Sousa', cidade: 'Fortaleza — CE', avatar: 'PS' },
+    fases: [
+      {
+        tipo: 'triagem',
+        pill: 'Fase 1 — Triagem',
+        titulo: 'Como você classifica e prioriza?',
+        sub: 'Defina a prioridade e o encaminhamento correto.',
+        mensagem: 'URGENTE!!! A vigilância sanitária está na loja agora! O que faço???',
+        opcoes: [
+          { letra: 'A', texto: 'Prioridade Média — orientar a apresentar documentos normalmente', certa: false },
+          { letra: 'B', texto: 'Prioridade Alta — abrir ticket urgente para o Jurídico resolver', certa: false },
+          { letra: 'C', texto: 'Prioridade Urgente — atender imediatamente, escalar ao coordenador em paralelo, e orientar: receber a inspeção com calma, registrar tudo e comunicar a franqueadora', certa: true },
+          { letra: 'D', texto: 'Prioridade Alta — encaminhar para o canal de emergência da DFCOM', certa: false }
+        ],
+        feedback_certo: 'Vigilância Sanitária na loja = emergência real. Atendimento imediato + escalada ao coordenador em paralelo. Orientação: receber com calma, registrar tudo, comunicar a franqueadora.',
+        feedback_errado: 'Vigilância Sanitária é uma das situações que justificam acionamento de emergência — junto com polícia, agressão e desastres. O protocolo é atender imediatamente e escalar ao coordenador em PARALELO, não depois.',
+        resposta_sistema: 'Patrícia, mantendo a calma: receba a inspeção normalmente, seja cordial e cooperativa. Apresente todos os documentos que pedirem. Registre tudo (data, hora, nome do fiscal, o que foi verificado). Estou acionando nossa equipe agora em paralelo!'
+      },
+      {
+        tipo: 'resposta',
+        pill: 'Fase 2 — Resposta',
+        titulo: 'O que orientar durante a inspeção?',
+        sub: 'A VISA está pedindo documentos que a franqueada não encontra.',
+        mensagem: 'Eles estão pedindo o certificado de dedetização e eu não sei onde está!',
+        opcoes: [
+          { letra: 'A', texto: 'Orientar a pedir tempo ao fiscal e, se não encontrar, dizer que vai enviar por e-mail depois', certa: false },
+          { letra: 'B', texto: 'Informar que certificado de dedetização é demanda para Gestão de Documentos via ticket', certa: false },
+          { letra: 'C', texto: 'Orientar a ser transparente com o fiscal, cooperar totalmente com a inspeção, e abrir ticket agora para Gestão de Documentos acompanhar e ajudar a localizar o certificado', certa: true },
+          { letra: 'D', texto: 'Orientar a solicitar que o fiscal retorne em outro momento', certa: false }
+        ],
+        feedback_certo: 'Correto! Na inspeção da VISA: transparência, cooperação e comunicação imediata à franqueadora. Tentar adiar uma inspeção oficial pode agravar a situação juridicamente.',
+        feedback_errado: 'Durante inspeção da Vigilância Sanitária, nunca orientar a interromper ou adiar. Postura correta: cooperação total, transparência e comunicação imediata à franqueadora para acompanhamento.',
+        resposta_sistema: 'Patrícia, seja completamente transparente com o fiscal — diga que está localizando o documento. Coopere com toda a inspeção. Estou abrindo um ticket agora para Gestão de Documentos te ajudar. Anota tudo que o fiscal pedir!'
+      },
+      {
+        tipo: 'escrita',
+        pill: 'Fase 3 — Resposta Livre',
+        titulo: 'Escreva a orientação final para a Patrícia',
+        sub: 'A inspeção terminou e a VISA deixou uma notificação formal. Escreva o que você diria para ela agora.',
+        mensagem: 'Eles foram embora e me deixaram uma notificação formal. O que eu faço com isso?',
+        campo_label: 'Sua resposta para a Patrícia:',
+        campo_placeholder: 'Escreva aqui como orientaria a Patrícia sobre a notificação...',
+        avaliacao_prompt: `Você é um supervisor de qualidade de atendimento da Cresci e Perdi. Um colaborador em treinamento escreveu a seguinte resposta para uma franqueada que recebeu uma notificação formal da Vigilância Sanitária:
+
+RESPOSTA DO COLABORADOR: "{resposta}"
+
+O protocolo correto é: registrar o conteúdo da notificação no ticket, escalar imediatamente ao coordenador e área jurídica, NÃO emitir posicionamento sobre o mérito, e instruir a franqueada a não responder sozinha.
+
+Avalie em 3 critérios (de 0 a 10):
+1. CONTEÚDO: a resposta orienta corretamente sobre não responder sozinha, escalar para o jurídico e registrar no ticket?
+2. TOM: é empático, claro e profissional sem gerar pânico?
+3. PORTUGUÊS: gramática, concordância e clareza estão adequadas para comunicação profissional?
+
+Responda APENAS em JSON válido:
+{"conteudo": número, "tom": número, "portugues": número, "feedback": "texto de até 3 linhas", "aprovado": true ou false}
+
+Aprovado se média >= 6.`,
+        resposta_sistema: 'Patrícia, muito importante: não responda a notificação por conta própria. Fotografe o documento completo agora. Vou registrar no ticket e acionar nossa equipe jurídica imediatamente — eles vão orientar sobre os prazos e a resposta correta. Você não precisa fazer nada sozinha! 🙏'
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════
+  // CASO 4 — ROYALTY E CRISE FINANCEIRA
+  // ══════════════════════════════════════════════════════════
+  {
+    id: 4,
+    franqueado: { nome: 'Juliana Costa', cidade: 'Belo Horizonte — MG', avatar: 'JC' },
+    fases: [
+      {
+        tipo: 'triagem',
+        pill: 'Fase 1 — Triagem',
+        titulo: 'O que está dentro do escopo do Concierge?',
+        sub: 'Identifique o que você pode resolver e o que precisa direcionar.',
+        mensagem: 'Oi, o boleto do royalty veio diferente do mês passado. Posso pedir pra postergar o vencimento em 15 dias? Tô com caixa apertado.',
+        opcoes: [
+          { letra: 'A', texto: 'O Concierge resolve: aprovar a postergação de 15 dias como boa vontade', certa: false },
+          { letra: 'B', texto: 'Explicar o reajuste com o script do manual, e orientar ticket para o Financeiro para postergação — sem prometer nada', certa: true },
+          { letra: 'C', texto: 'Escalar para o coordenador, pois postergação de royalty é decisão de liderança', certa: false },
+          { letra: 'D', texto: 'Informar que postergação não é possível em nenhuma circunstância', certa: false }
+        ],
+        feedback_certo: 'O Concierge explica o reajuste mas NÃO negocia valores, desconta taxas nem prorroga vencimentos. Isso é exclusivo do Financeiro (Contas a Receber) via ticket.',
+        feedback_errado: 'O analista pode explicar o reajuste, mas qualquer negociação financeira — postergação, desconto, acordo — é exclusiva do Financeiro. O Concierge orienta o ticket, nunca promete.',
+        resposta_sistema: 'Juliana, sobre o reajuste: conforme previsto em contrato, ele já estava programado para esse mês — é uma obrigação contratual que não pode ser cancelada. Sobre a postergação: não está no meu escopo, mas você pode solicitar ao Financeiro via ticket. Acordos são possíveis, mas precisam ser feitos antes do vencimento!'
+      },
+      {
+        tipo: 'resposta',
+        pill: 'Fase 2 — Resposta',
+        titulo: 'Como responder sobre o valor do royalty?',
+        sub: 'Ela questiona o que recebe em troca. Qual é a fala correta?',
+        mensagem: 'Mas eu não entendo por que pago esse royalty. O que eu recebo em troca?',
+        opcoes: [
+          { letra: 'A', texto: '"É uma obrigação contratual. Infelizmente não há muito o que questionar."', certa: false },
+          { letra: 'B', texto: '"O royalty financia o suporte, o treinamento da sua equipe, as campanhas que trazem clientes, a tecnologia e o trabalho de toda a franqueadora — com percentual fixo sobre o faturamento, conforme previsto em contrato."', certa: true },
+          { letra: 'C', texto: '"Vou verificar a composição do royalty com o Financeiro e te retorno com uma planilha."', certa: false },
+          { letra: 'D', texto: '"O royalty é padrão do mercado de franquias. Todas as redes cobram isso."', certa: false }
+        ],
+        feedback_certo: 'Essa é a fala do manual — conectar o royalty ao valor concreto que o franqueado recebe. Transforma uma objeção em argumento de parceria. Nunca ser defensivo ou minimizar a dúvida.',
+        feedback_errado: 'A resposta correta transforma a objeção em conversa de valor. O script do manual lista exatamente o que o royalty financia. Resposta defensiva ou vaga não funciona.',
+        resposta_sistema: 'Juliana, entendo a dúvida! O royalty financia o suporte que você acessa agora, o treinamento da sua equipe, as campanhas nacionais, a tecnologia dos sistemas — e o trabalho de toda a franqueadora que está aqui para te ajudar a ter resultado. Com percentual fixo sobre o faturamento conforme contrato, você paga de acordo com o que fatura. É o modelo mais justo. 💚'
+      },
+      {
+        tipo: 'complicacao',
+        pill: 'Fase 3 — Complicação',
+        titulo: 'Ela revela crise financeira grave. Como agir?',
+        sub: 'Múltiplos sinais de alerta. Identifique todos e o protocolo completo.',
+        mensagem: 'A verdade é que faz 3 meses que estou no prejuízo. Tive que demitir uma funcionária e meu fornecedor ameaçou cortar meu crédito.',
+        opcoes: [
+          { letra: 'A', texto: 'Oferecer orientações operacionais de como aumentar as vendas', certa: false },
+          { letra: 'B', texto: 'Registrar os sinais no ticket, escalar SIMULTANEAMENTE para Financeiro e Relacionamento, tratar com empatia e discrição', certa: true },
+          { letra: 'C', texto: 'Encaminhar apenas para o Financeiro, pois o problema é o pagamento do royalty', certa: false },
+          { letra: 'D', texto: 'Escalar imediatamente para a diretoria como crise grave', certa: false }
+        ],
+        feedback_certo: 'Múltiplos sinais de colapso = escalada SIMULTÂNEA para Financeiro E Relacionamento. O Relacionamento existe exatamente para montar um plano de ação com o franqueado nessas situações.',
+        feedback_errado: 'Sinais de colapso financeiro exigem escalada SIMULTÂNEA para Financeiro + Relacionamento — não só um ou a diretoria. O Relacionamento monta o plano de ação com o franqueado.',
+        resposta_sistema: 'Juliana, obrigada por confiar e ser transparente. Entendo que esse momento é muito difícil. Vou registrar agora e acionar nossa equipe de Relacionamento junto com o Financeiro — eles vão entrar em contato para conversar sobre um plano de ação. Você não está sozinha. 💚'
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════
+  // CASO 5 — FRANQUEADO QUER VENDER A UNIDADE (sensível)
+  // ══════════════════════════════════════════════════════════
+  {
+    id: 5,
+    franqueado: { nome: 'Anderson Lima', cidade: 'Goiânia — GO', avatar: 'AL' },
+    fases: [
+      {
+        tipo: 'triagem',
+        pill: 'Fase 1 — Triagem',
+        titulo: 'Como você classifica essa situação?',
+        sub: 'Defina prioridade e encaminhamento correto.',
+        mensagem: 'Oi, preciso conversar. Encontrei um comprador para minha loja. Como funciona o processo de venda?',
+        opcoes: [
+          { letra: 'A', texto: 'Emergência — escalar imediatamente ao coordenador e ao Jurídico', certa: false },
+          { letra: 'B', texto: 'Situação sensível mas não urgente — tratar com respeito, registrar e acionar Expansão em até 1 hora', certa: true },
+          { letra: 'C', texto: 'Demanda rotineira — o Concierge explica o processo de transferência diretamente', certa: false },
+          { letra: 'D', texto: 'Prioridade Baixa — o franqueado pode aguardar o contato da equipe de Expansão sem urgência', certa: false }
+        ],
+        feedback_certo: 'Intenção de venda = sensível, não urgente. Tratamento respeitoso e discrição absoluta. Escalar para Expansão em até 1 hora.',
+        feedback_errado: 'Intenção de venda da unidade é sensível — não é emergência, mas exige escalada rápida (<1h) para Expansão. Nunca tratar como demanda rotineira nem urgência desnecessária.',
+        resposta_sistema: 'Anderson, entendido. Esse processo envolve passos específicos que a equipe de Expansão vai detalhar com você. Vou registrar e acionar eles agora para entrar em contato. Enquanto isso, mantenha a operação normalmente — é importante não comunicar publicamente a venda antes de tudo formalizado.'
+      },
+      {
+        tipo: 'resposta',
+        pill: 'Fase 2 — Resposta',
+        titulo: 'O franqueado pergunta se pode fechar o negócio antes de avisar a franqueadora.',
+        sub: 'Qual é a orientação correta sobre o processo de transferência?',
+        mensagem: 'Posso assinar um contrato particular com o comprador antes de formalizar com a Cresci e Perdi?',
+        opcoes: [
+          { letra: 'A', texto: '"Pode assinar um pré-contrato particular, desde que a transferência oficial ocorra depois da aprovação."', certa: false },
+          { letra: 'B', texto: '"Não. O primeiro passo obrigatório é comunicar formalmente a franqueadora via ticket — ela tem direito de preferência na compra antes de qualquer terceiro. Transferência sem autorização é causa de rescisão contratual."', certa: true },
+          { letra: 'C', texto: '"Pode vender livremente, mas precisa comunicar a franqueadora em até 30 dias após a assinatura."', certa: false },
+          { letra: 'D', texto: '"Não sei informar sobre isso, vou escalar para o Jurídico responder."', certa: false }
+        ],
+        feedback_certo: 'Correto! A franqueadora tem direito de preferência. O franqueado deve comunicar formalmente ANTES de qualquer negociação com terceiros. Transferência não autorizada = rescisão contratual.',
+        feedback_errado: 'A franqueadora tem direito de preferência — deve ser comunicada ANTES de qualquer terceiro. Transferência não autorizada é causa de rescisão contratual. Isso precisa ser informado claramente.',
+        resposta_sistema: 'Anderson, atenção nesse ponto: você precisa comunicar a franqueadora ANTES de qualquer negociação com terceiros. A Cresci e Perdi tem direito de preferência — ou seja, pode comprar a unidade antes de qualquer comprador externo. Fazer diferente pode colocar o contrato em risco. O ticket para Expansão já está encaminhado!'
+      },
+      {
+        tipo: 'escrita',
+        pill: 'Fase 3 — Resposta Livre',
+        titulo: 'Escreva a mensagem de encerramento para o Anderson',
+        sub: 'Ele quer saber quanto tempo o processo de transferência costuma levar. Responda com precisão e no tom correto — sem inventar prazos que você não sabe.',
+        mensagem: 'E quanto tempo esse processo costuma levar? Tenho urgência pois o comprador quer fechar rápido.',
+        campo_label: 'Sua resposta para o Anderson:',
+        campo_placeholder: 'Escreva aqui como responderia sobre o prazo...',
+        avaliacao_prompt: `Você é um supervisor de qualidade de atendimento da Cresci e Perdi. Um colaborador em treinamento escreveu a seguinte resposta para um franqueado que perguntou quanto tempo leva o processo de transferência de unidade:
+
+RESPOSTA DO COLABORADOR: "{resposta}"
+
+O protocolo correto é: NÃO inventar prazos que não são conhecidos, reconhecer a urgência do franqueado com empatia, deixar claro que a equipe de Expansão vai informar os prazos precisos, e orientar a não fechar nenhum acordo com o comprador antes da formalização com a franqueadora.
+
+Avalie em 3 critérios (de 0 a 10):
+1. CONTEÚDO: o colaborador evitou inventar prazos, direcionou para Expansão e reforçou a importância de não fechar antes de formalizar?
+2. TOM: reconheceu a urgência com empatia sem gerar falsas expectativas?
+3. PORTUGUÊS: gramática, concordância e clareza estão adequadas para comunicação profissional?
+
+Responda APENAS em JSON válido:
+{"conteudo": número, "tom": número, "portugues": número, "feedback": "texto de até 3 linhas", "aprovado": true ou false}
+
+Aprovado se média >= 6.`,
+        resposta_sistema: 'Anderson, entendo a urgência! Não tenho o prazo exato — cada processo tem especificidades próprias. A equipe de Expansão vai te passar essas informações com precisão assim que entrar em contato. O que posso adiantar: é importante que o comprador saiba que nenhum acordo pode ser fechado antes da aprovação da franqueadora. Isso protege você também! 💚'
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════
+  // CASO 6 — COLABORADOR SEM REGISTRO (cotidiano / crítico)
+  // ══════════════════════════════════════════════════════════
+  {
+    id: 6,
+    franqueado: { nome: 'Roberto Mendes', cidade: 'Porto Alegre — RS', avatar: 'RM' },
+    fases: [
+      {
+        tipo: 'triagem',
+        pill: 'Fase 1 — Triagem',
+        titulo: 'Como você age com essa informação?',
+        sub: 'Avalie a gravidade e defina o protocolo.',
+        mensagem: 'Ah, aproveitando o contato: tenho uma funcionária trabalhando há 2 meses sem registro ainda. Ainda não tive tempo. Tem problema?',
+        opcoes: [
+          { letra: 'A', texto: 'Informar que tem 30 dias para regularizar antes de haver problema', certa: false },
+          { letra: 'B', texto: 'Alertar com clareza que isso é linha vermelha: colaborador sem registro antes de começar a trabalhar é infração grave, com multa e passivo trabalhista — orientar regularizar IMEDIATAMENTE', certa: true },
+          { letra: 'C', texto: 'Dizer que é responsabilidade do franqueado e que o Concierge não pode ajudar com isso', certa: false },
+          { letra: 'D', texto: 'Abrir um ticket para o Jurídico sem alertar o franqueado sobre a gravidade', certa: false }
+        ],
+        feedback_certo: 'Colaborador sem registro por 2 meses é linha vermelha absoluta. O analista alerta com clareza, sem julgamento, e orienta regularização imediata. A multa e o passivo trabalhista acumulam rápido.',
+        feedback_errado: 'Colaborador sem registro é linha vermelha absoluta no manual de RH. O analista alerta imediatamente — não pode tratar como algo menor. A multa e o passivo trabalhista podem ser maiores do que qualquer economia.',
+        resposta_sistema: 'Roberto, essa informação é muito importante e preciso ser direto: colaborador trabalhando sem registro há 2 meses é uma situação de alto risco legal. A multa e o passivo trabalhista podem ser muito maiores do que qualquer custo de regularização. A recomendação é regularizar imediatamente: eSocial, exame admissional e contrato de trabalho no primeiro dia.'
+      },
+      {
+        tipo: 'resposta',
+        pill: 'Fase 2 — Resposta',
+        titulo: 'Ele pede orientação sobre como regularizar. Qual o limite do seu papel?',
+        sub: 'Defina o que você pode e não pode orientar.',
+        mensagem: 'E se ela entrar com ação trabalhista por isso? O que acontece com a Cresci e Perdi?',
+        opcoes: [
+          { letra: 'A', texto: '"A Cresci e Perdi vai te representar juridicamente nesse caso."', certa: false },
+          { letra: 'B', texto: '"Cada unidade responde pelas suas próprias obrigações trabalhistas. A franqueadora não é parte da ação — mas recomendo contratar um advogado trabalhista agora e comunicar a franqueadora via ticket."', certa: true },
+          { letra: 'C', texto: '"Essa situação não vai chegar a esse ponto se você regularizar logo."', certa: false },
+          { letra: 'D', texto: '"Não posso informar sobre ações trabalhistas. Escalo para o Jurídico responder."', certa: false }
+        ],
+        feedback_certo: 'Correto! O franqueado é o empregador — cada unidade responde pelas suas obrigações. A franqueadora não assume passivo trabalhista. O analista orienta sem dar aconselhamento jurídico.',
+        feedback_errado: 'O franqueado é o empregador — a franqueadora não é parte em ações trabalhistas das unidades. O analista informa isso claramente, orienta sobre advogado trabalhista, e nunca promete representação jurídica.',
+        resposta_sistema: 'Roberto, importante deixar claro: cada unidade responde pelas suas próprias obrigações trabalhistas. A Cresci e Perdi não é parte nessa ação. Por isso é ainda mais urgente regularizar agora e, se quiser, posso indicar a Dra. Marlete Barros (+55 11 98228-6753) — advogada trabalhista de confiança da nossa rede.'
+      },
+      {
+        tipo: 'complicacao',
+        pill: 'Fase 3 — Complicação',
+        titulo: 'O franqueado diz que "todo mundo faz isso". Como agir?',
+        sub: 'Ele minimiza a situação. Mantenha a postura correta.',
+        mensagem: 'Mas todo mundo faz isso no começo. Outros franqueados da rede também têm funcionários sem registro nos primeiros meses.',
+        opcoes: [
+          { letra: 'A', texto: 'Concordar parcialmente dizendo que é comum mas que ele deve regularizar', certa: false },
+          { letra: 'B', texto: '"Não posso validar essa exceção — mesmo que pareça comum, o risco legal é real e a obrigação é do franqueado. A orientação continua a mesma: regularizar imediatamente. Documente a conversa e registre no ticket."', certa: true },
+          { letra: 'C', texto: 'Dizer que vai verificar com o coordenador se realmente é comum na rede', certa: false },
+          { letra: 'D', texto: 'Encerrar o assunto dizendo que cada um é responsável pelas suas decisões', certa: false }
+        ],
+        feedback_certo: 'Nunca valide a exceção mesmo que pareça razoável. Explique que a uniformidade da obrigação legal não tem exceção, documente a conversa e registre no ticket. O manual é claro sobre isso.',
+        feedback_errado: 'Nunca valide a exceção — "todo mundo faz" não elimina o risco legal do franqueado. O analista mantém a orientação, documenta a conversa e não confirma práticas irregulares de outros franqueados.',
+        resposta_sistema: 'Roberto, entendo a percepção, mas não posso validar essa prática. A obrigação de registrar antes do início das atividades é legal — não é opção. O risco é do franqueado independente do que outros façam. A orientação continua: regularize imediatamente. Vou registrar essa conversa no ticket para acompanhamento. 🙏'
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════
+  // CASO 7 — ACIONAMENTO INDEVIDO DE EMERGÊNCIA (cotidiano / obvio mas gera dúvida)
+  // ══════════════════════════════════════════════════════════
+  {
+    id: 7,
+    franqueado: { nome: 'Carla Nascimento', cidade: 'Manaus — AM', avatar: 'CN' },
+    fases: [
+      {
+        tipo: 'triagem',
+        pill: 'Fase 1 — Triagem',
+        titulo: 'Isso é uma emergência?',
+        sub: 'Avalie com critério.',
+        mensagem: 'EMERGÊNCIA! Minha internet caiu e não consigo abrir o sistema de caixa! Tô com fila de clientes aqui!',
+        opcoes: [
+          { letra: 'A', texto: 'Sim, emergência — acionar canal de emergência imediatamente', certa: false },
+          { letra: 'B', texto: 'Sim, urgente — escalar ao coordenador em até 2 horas', certa: false },
+          { letra: 'C', texto: 'Não é emergência — problema técnico tem prioridade Alta no máximo. Usar script de acionamento indevido e orientar diagnóstico de primeiro nível (reiniciar roteador, testar modo offline)', certa: true },
+          { letra: 'D', texto: 'Não é emergência — prioridade Baixa, orientar abrir ticket e aguardar', certa: false }
+        ],
+        feedback_certo: 'Queda de internet NÃO é emergência real. Emergência = risco físico (polícia, agressão, VISA, desastre). Impacto na operação = Alta no máximo. Aplicar script de acionamento indevido e orientar diagnóstico de primeiro nível.',
+        feedback_errado: 'Emergência real tem critérios específicos: polícia na loja, desastre natural, VISA, agressão em curso. Queda de internet é problema técnico operacional — prioridade Alta no máximo, nunca emergência. Tratar tudo como emergência compromete o sistema.',
+        resposta_sistema: 'Carla, entendo a pressão! Mas o canal de emergência é reservado para riscos físicos reais — como polícia na loja, agressão ou desastre. Para resolver agora: reinicie o roteador (desligar da tomada, 30 segundos, ligar). Se tiver modo offline no PDV, ative. Se persistir por mais de 30 minutos, abra ticket de suporte técnico com prioridade Urgente.'
+      },
+      {
+        tipo: 'resposta',
+        pill: 'Fase 2 — Resposta',
+        titulo: 'Ela pergunta o que fazer com os clientes que estão esperando.',
+        sub: 'Qual é a orientação operacional correta?',
+        mensagem: 'E os clientes que estão aqui esperando? O que falo para eles?',
+        opcoes: [
+          { letra: 'A', texto: 'Orientar a fechar a loja enquanto o sistema não voltar', certa: false },
+          { letra: 'B', texto: 'Orientar a informar os clientes sobre a instabilidade técnica, oferecer um tempo de espera realista, e se possível registrar dados para retomada manual quando o sistema voltar', certa: true },
+          { letra: 'C', texto: 'Orientar a fazer atendimento sem sistema e registrar depois', certa: false },
+          { letra: 'D', texto: 'Dizer que problema técnico não é responsabilidade do Concierge', certa: false }
+        ],
+        feedback_certo: 'Correto! Transparência com o cliente sobre a instabilidade, tempo de espera realista, e preparação para retomada. Nunca fechar a loja por problema técnico sem escalar antes.',
+        feedback_errado: 'A orientação correta é transparência com o cliente, tempo de espera realista, e preparação para retomada quando o sistema voltar. Fechar a loja sem escalar é a pior opção.',
+        resposta_sistema: 'Carla, oriente sua equipe a ser transparente com os clientes: "Estamos com uma instabilidade técnica momentânea, estamos resolvendo." Dê um tempo de espera realista. Se o sistema não voltar em 10-15 minutos, registre os dados dos clientes manualmente para retomada. Nunca feche a loja sem escalar primeiro!'
+      },
+      {
+        tipo: 'escrita',
+        pill: 'Fase 3 — Resposta Livre',
+        titulo: 'Escreva a mensagem de orientação final',
+        sub: 'O roteador foi reiniciado e a internet voltou, mas o PDV ainda não conectou. Escreva o que você diria para a Carla agora.',
+        mensagem: 'Reiniciei o roteador, a internet voltou no celular mas o PDV ainda não conectou no sistema.',
+        campo_label: 'Sua resposta para a Carla:',
+        campo_placeholder: 'Escreva aqui o que você orientaria agora...',
+        avaliacao_prompt: `Você é um supervisor de qualidade de atendimento da Cresci e Perdi. Um colaborador em treinamento escreveu a seguinte resposta para uma franqueada cuja internet voltou mas o PDV ainda não conectou:
+
+RESPOSTA DO COLABORADOR: "{resposta}"
+
+O protocolo correto é: orientar a reiniciar o PDV (desligar, aguardar 30 segundos, ligar), verificar se o cabo de rede está conectado, e se persistir, abrir ticket de suporte técnico com prioridade URGENTE informando modelo do equipamento, mensagem de erro e horário do problema.
+
+Avalie em 3 critérios (de 0 a 10):
+1. CONTEÚDO: o colaborador orientou os passos corretos de diagnóstico e o caminho certo se não resolver?
+2. TOM: é direto, prático e transmite segurança sem criar ansiedade?
+3. PORTUGUÊS: gramática, concordância e clareza estão adequadas para comunicação profissional?
+
+Responda APENAS em JSON válido:
+{"conteudo": número, "tom": número, "portugues": número, "feedback": "texto de até 3 linhas", "aprovado": true ou false}
+
+Aprovado se média >= 6.`,
+        resposta_sistema: 'Carla, ótimo que a internet voltou! Agora: reinicie o PDV (desligue completamente, aguarde 30 segundos, ligue). Verifique se o cabo de rede está conectado firmemente. Se o problema persistir depois disso, abra um ticket de suporte técnico com prioridade URGENTE — informe o modelo do equipamento, a mensagem de erro exibida e o horário do problema. Estou aqui! 💚'
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════
+  // CASO 8 — EVENTO NÃO AUTORIZADO (marketing / padrão)
+  // ══════════════════════════════════════════════════════════
+  {
+    id: 8,
+    franqueado: { nome: 'Bruna Ferreira', cidade: 'Natal — RN', avatar: 'BF' },
+    fases: [
+      {
+        tipo: 'triagem',
+        pill: 'Fase 1 — Triagem',
+        titulo: 'Como você age com esse pedido?',
+        sub: 'Identifique o problema e o encaminhamento.',
+        mensagem: 'Oi! Criei um evento aqui chamado "Liquidação da Bruna — 40% em tudo" e já postei no Instagram. Pode me ajudar a fazer a arte do evento?',
+        opcoes: [
+          { letra: 'A', texto: 'Encaminhar para equipe Agência para produzir a arte do evento', certa: false },
+          { letra: 'B', texto: 'Informar que eventos não autorizados violam as diretrizes da rede, orientar remover a publicação, e explicar que nenhum franqueado pode criar ou modificar eventos por conta própria', certa: true },
+          { letra: 'C', texto: 'Aprovar o evento e orientar a pedir aprovação retroativa para a franqueadora', certa: false },
+          { letra: 'D', texto: 'Orientar a substituir o nome do evento por um nome oficial e continuar', certa: false }
+        ],
+        feedback_certo: 'Correto! Nenhum franqueado pode criar ou modificar eventos sem autorização. O analista orienta remoção da publicação e explica as consequências — não produz arte para evento não autorizado.',
+        feedback_errado: 'Eventos não autorizados são uma infração às diretrizes da rede. O analista nunca produz arte nem valida evento criado sem aprovação — orienta a remoção e explica as consequências.',
+        resposta_sistema: 'Bruna, preciso te alertar: não é permitido criar ou modificar eventos por conta própria. Todos os eventos devem seguir exclusivamente as diretrizes da franqueadora. Recomendo remover a publicação agora para evitar consequências. As unidades que descumpriram já estão sendo tratadas internamente. Posso te orientar sobre os eventos oficiais disponíveis no Dashboard!'
+      },
+      {
+        tipo: 'resposta',
+        pill: 'Fase 2 — Resposta',
+        titulo: 'Ela questiona por que não pode criar eventos próprios.',
+        sub: 'Explique a lógica com a argumentação correta do manual.',
+        mensagem: 'Mas é minha loja! Por que não posso criar meu próprio evento?',
+        opcoes: [
+          { letra: 'A', texto: '"Porque é regra do contrato e você assinou comprometendo-se a seguir."', certa: false },
+          { letra: 'B', texto: '"Porque eventos são estratégias nacionais planejadas centralmente. Um evento não autorizado quebra o padrão da rede, cria expectativas que outras unidades não podem atender, pode gerar passivo jurídico (PROCON) e enfraquece as campanhas nacionais."', certa: true },
+          { letra: 'C', texto: '"Porque a franqueadora precisa controlar a imagem da marca para todos os franqueados."', certa: false },
+          { letra: 'D', texto: '"Porque cada evento precisa passar por aprovação formal que demora semanas."', certa: false }
+        ],
+        feedback_certo: 'Essa é a argumentação do manual — os 4 motivos reais: quebra de padrão, expectativa que outras unidades não atendem, passivo jurídico, e enfraquecimento das campanhas nacionais.',
+        feedback_errado: 'A resposta correta explica os 4 motivos do manual: quebra de padrão, expectativas que outras unidades não atendem, passivo jurídico (PROCON), e enfraquecimento das campanhas nacionais. "É regra" sozinho não gera adesão.',
+        resposta_sistema: 'Bruna, entendo a lógica! Mas os eventos são estratégias nacionais planejadas para beneficiar toda a rede. Quando uma loja cria um evento próprio, ela quebra o padrão que os clientes esperam em toda a rede, cria expectativas que outras unidades não podem atender, e pode gerar passivo jurídico por promoções irregulares. A rede inteira fica mais fraca. Os eventos oficiais são exatamente para te dar isso de forma protegida!'
+      },
+      {
+        tipo: 'complicacao',
+        pill: 'Fase 3 — Complicação',
+        titulo: 'Ela diz que outros franqueados fazem eventos próprios.',
+        sub: 'Como você responde mantendo a postura correta?',
+        mensagem: 'Mas eu sei que outras lojas da rede criam eventos próprios e ninguém faz nada. Por que comigo seria diferente?',
+        opcoes: [
+          { letra: 'A', texto: '"Você tem razão que isso acontece, mas é errado em qualquer caso. Aqui não vou validar."', certa: false },
+          { letra: 'B', texto: '"As unidades que descumpriram as orientações já estão sendo tratadas internamente. A franqueadora tem ciência de todos os ocorridos e tomará as medidas cabíveis — inclusive com a sua unidade, se mantiver a publicação."', certa: true },
+          { letra: 'C', texto: '"Não tenho informação sobre outras unidades. Posso falar só pelo seu caso."', certa: false },
+          { letra: 'D', texto: '"Se outros fazem, é um problema da rede como um todo. Mas no seu caso, precisamos resolver."', certa: false }
+        ],
+        feedback_certo: 'Essa é a fala exata do script do manual. Não confirmar nem negar o que outras lojas fazem — usar a resposta padrão que deixa claro que a franqueadora tem ciência e tomará medidas.',
+        feedback_errado: 'O script do manual é claro: "As unidades que descumpriram já estão sendo tratadas internamente." Nunca confirmar que outras unidades fazem irregularidades, nunca relativizar a regra, nunca dizer que não sabe.',
+        resposta_sistema: 'Bruna, as unidades que descumpriram as orientações já estão sendo tratadas internamente pela franqueadora. A rede tem ciência de todos os ocorridos e tomará as medidas cabíveis diretamente com cada unidade. Para o seu caso, o importante agora é remover a publicação e seguir pelos canais corretos. Posso te ajudar a acessar os eventos oficiais!'
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════
+  // CASO 9 — CONTRATAÇÃO SEM CRITÉRIO (RH / cotidiano)
+  // ══════════════════════════════════════════════════════════
+  {
+    id: 9,
+    franqueado: { nome: 'Diego Santos', cidade: 'Recife — PE', avatar: 'DS' },
+    fases: [
+      {
+        tipo: 'triagem',
+        pill: 'Fase 1 — Triagem',
+        titulo: 'Qual o papel do Concierge aqui?',
+        sub: 'Defina o que você pode orientar.',
+        mensagem: 'Quero contratar minha irmã para trabalhar na loja. Tem algum impedimento?',
+        opcoes: [
+          { letra: 'A', texto: 'Não há nada a orientar — é decisão pessoal do franqueado', certa: false },
+          { letra: 'B', texto: 'Alertar que há impedimento legal para contratar familiares', certa: false },
+          { letra: 'C', texto: 'Usar o script do manual: não há impedimento legal, mas alertar sobre os riscos práticos — mistura de relações pessoais e profissionais, necessidade de tratar o familiar como qualquer colaborador (incluindo advertências e demissão)', certa: true },
+          { letra: 'D', texto: 'Escalar para o RH da franqueadora avaliar o caso', certa: false }
+        ],
+        feedback_certo: 'O script do manual é claro: sem impedimento legal, mas com riscos práticos que precisam ser considerados. O analista orienta — não decide pela pessoa.',
+        feedback_errado: 'Não há impedimento legal para contratar familiares. O script correto reconhece isso e alerta sobre os riscos práticos da mistura entre relações pessoais e profissionais.',
+        resposta_sistema: 'Diego, não há impedimento legal para contratar um familiar. Mas há riscos que precisam ser considerados: a mistura de relações pessoais e profissionais pode gerar conflitos. A irmã precisaria ser tratada como qualquer outro colaborador — incluindo feedbacks, advertências e eventual desligamento. Se isso não for possível na prática, a contratação pode criar problemas sérios.'
+      },
+      {
+        tipo: 'resposta',
+        pill: 'Fase 2 — Resposta',
+        titulo: 'Ele pergunta se pode contratar sem fazer exame admissional.',
+        sub: 'Qual é a orientação sobre documentação na admissão?',
+        mensagem: 'E preciso mesmo fazer exame admissional? É minha irmã, conheço ela há toda a vida.',
+        opcoes: [
+          { letra: 'A', texto: '"Para familiar próximo, o exame admissional pode ser dispensado na prática."', certa: false },
+          { letra: 'B', texto: '"O exame admissional é obrigatório por lei para qualquer colaborador, independente do grau de parentesco. Também deve registrar no eSocial ANTES do início das atividades e assinar o contrato no primeiro dia."', certa: true },
+          { letra: 'C', texto: '"Pode fazer em até 30 dias após o início das atividades."', certa: false },
+          { letra: 'D', texto: '"Recomendo fazer para evitar problemas, mas não é obrigatório legalmente."', certa: false }
+        ],
+        feedback_certo: 'Correto! Exame admissional obrigatório por lei para qualquer colaborador, sem exceção. eSocial ANTES do início das atividades. Não há exceção para familiar.',
+        feedback_errado: 'O exame admissional é obrigatório por lei — sem exceção para familiar. O eSocial deve ser feito ANTES do início das atividades. Essa é uma linha vermelha do manual de RH.',
+        resposta_sistema: 'Diego, o exame admissional é obrigatório por lei para qualquer colaborador — sem exceção, mesmo sendo familiar. Além disso: registre no eSocial ANTES do início das atividades e assine o contrato de trabalho no primeiro dia. Nunca deixe um colaborador trabalhar sem registro — a multa e o passivo trabalhista não compensam!'
+      },
+      {
+        tipo: 'escrita',
+        pill: 'Fase 3 — Resposta Livre',
+        titulo: 'Ele pergunta sobre escala de trabalho',
+        sub: 'Ele quer colocar a irmã para trabalhar 10 horas por dia todos os dias. Escreva sua orientação.',
+        mensagem: 'E posso colocar ela para trabalhar 10 horas por dia, todos os dias da semana? Preciso muito de apoio agora.',
+        campo_label: 'Sua resposta para o Diego:',
+        campo_placeholder: 'Escreva aqui como orientaria sobre a jornada de trabalho...',
+        avaliacao_prompt: `Você é um supervisor de qualidade de atendimento da Cresci e Perdi. Um colaborador em treinamento escreveu a seguinte resposta para um franqueado que quer colocar a funcionária para trabalhar 10 horas por dia, todos os dias:
+
+RESPOSTA DO COLABORADOR: "{resposta}"
+
+O protocolo correto é: informar que a lei trabalhista limita a jornada a 8h/dia e 44h/semana, com no máximo 2h extras por dia (salvo acordo coletivo), e que banco de horas descontrolado vira passivo trabalhista. O analista não dá aconselhamento jurídico detalhado, mas alerta sobre os riscos e orienta a consultar um advogado trabalhista ou o RH da franqueadora para montar uma escala legal.
+
+Avalie em 3 critérios (de 0 a 10):
+1. CONTEÚDO: o colaborador alertou sobre os limites legais, mencionou o risco de passivo trabalhista e orientou a buscar orientação especializada?
+2. TOM: foi direto mas empático, sem julgar o franqueado?
+3. PORTUGUÊS: gramática, concordância e clareza estão adequadas para comunicação profissional?
+
+Responda APENAS em JSON válido:
+{"conteudo": número, "tom": número, "portugues": número, "feedback": "texto de até 3 linhas", "aprovado": true ou false}
+
+Aprovado se média >= 6.`,
+        resposta_sistema: 'Diego, entendo a necessidade, mas preciso alertar: a lei trabalhista limita a jornada a 8 horas por dia e 44 horas semanais, com no máximo 2 horas extras por dia. Trabalhar 10 horas todos os dias sem acordo coletivo é irregular — e banco de horas descontrolado vira passivo trabalhista. Para montar uma escala legal, recomendo consultar um advogado trabalhista ou o RH da franqueadora antes de definir a jornada. 🙏'
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════
+  // CASO 10 — FRANQUEADO INDIGNADO COM RESPOSTA ANTERIOR (hipotético / emocional)
+  // ══════════════════════════════════════════════════════════
+  {
+    id: 10,
+    franqueado: { nome: 'Mônica Alves', cidade: 'Salvador — BA', avatar: 'MA' },
+    fases: [
+      {
+        tipo: 'triagem',
+        pill: 'Fase 1 — Triagem',
+        titulo: 'Como você classifica essa situação?',
+        sub: 'Avalie prioridade e postura correta.',
+        mensagem: 'Boa tarde. Abri um ticket há 3 dias sobre um problema com meu caixa e ninguém me respondeu. Isso é desrespeito!',
+        opcoes: [
+          { letra: 'A', texto: 'Prioridade Baixa — ticket em aberto faz parte do fluxo normal', certa: false },
+          { letra: 'B', texto: 'Prioridade Alta — franqueada indignada sem resolução. Verificar status do ticket, se realmente sem resposta: reconhecer, corrigir, registrar aprendizado, e escalar ao coordenador em até 4 horas', certa: true },
+          { letra: 'C', texto: 'Prioridade Urgente — escalar imediatamente ao coordenador como crise', certa: false },
+          { letra: 'D', texto: 'Orientar a franqueada a abrir um novo ticket, pois o anterior pode ter sido perdido', certa: false }
+        ],
+        feedback_certo: 'Franqueada indignada sem resolução = Alta, não crise. Verificar o status real do ticket primeiro — se sem resposta: reconhecer, corrigir e registrar como aprendizado. Escalar ao coordenador em até 4 horas.',
+        feedback_errado: 'Franqueado insatisfeito com resposta anterior = Alta, não crise nem baixa prioridade. Primeiro verificar o status real do ticket. Se sem resposta: reconhecer o erro, corrigir, registrar e escalar ao coordenador em até 4 horas.',
+        resposta_sistema: 'Mônica, obrigada por retornar. Vou verificar o status do seu ticket agora. [Verifica] Confirmo que o ticket está em aberto sem retorno — peço desculpas pela demora. Vou acionar a equipe responsável com prioridade agora mesmo e garantir que você receba uma resposta hoje. Vou acompanhar pessoalmente!'
+      },
+      {
+        tipo: 'resposta',
+        pill: 'Fase 2 — Resposta',
+        titulo: 'Ela pede que você resolva o problema diretamente por ela.',
+        sub: 'Defina o que está dentro e fora do seu escopo.',
+        mensagem: 'Não quero abrir mais ticket! Você resolve por mim ou não?',
+        opcoes: [
+          { letra: 'A', texto: '"Vou resolver agora mesmo, pode deixar comigo!"', certa: false },
+          { letra: 'B', texto: '"Entendo a frustração! O ticket é o canal formal que garante que sua solicitação chegue à equipe certa e tenha um responsável. Vou reabrir o ticket para você agora e acompanhar pessoalmente até ter uma resposta. Você não vai precisar fazer nada."', certa: true },
+          { letra: 'C', texto: '"Infelizmente não é possível resolver sem ticket. Esse é o processo da franqueadora."', certa: false },
+          { letra: 'D', texto: '"Posso fazer uma exceção e resolver por e-mail dessa vez."', certa: false }
+        ],
+        feedback_certo: 'Correto! Reconhece a frustração, explica o porquê do ticket com argumento de valor, e oferece ajuda ativa — o ticket é reabertura, não recusa.',
+        feedback_errado: 'A resposta correta reconhece a frustração, explica o valor do ticket (responsável formal) e oferece ajuda ativa. "É o processo" sozinho gera mais frustração. "Vou resolver" sem capacidade gera promessa falsa.',
+        resposta_sistema: 'Mônica, entendo perfeitamente! O ticket existe para garantir que sua solicitação chegue à equipe certa com um responsável formal. Vou reabrir o ticket para você agora mesmo — você não precisa fazer nada. Vou acompanhar pessoalmente até você receber uma resposta hoje. Me diz o número do ticket anterior para eu localizar!'
+      },
+      {
+        tipo: 'complicacao',
+        pill: 'Fase 3 — Complicação',
+        titulo: 'Ela ameaça falar com o CEO diretamente.',
+        sub: 'Como você responde mantendo postura profissional?',
+        mensagem: 'Vou ligar diretamente para o Saulo para reclamar do suporte. Tenho o número dele.',
+        opcoes: [
+          { letra: 'A', texto: 'Pedir que não acione o CEO e prometer resolver imediatamente para evitar o contato', certa: false },
+          { letra: 'B', texto: 'Manter tom profissional, não reagir à ameaça, registrar tudo no ticket, escalar ao coordenador, e continuar resolvendo o problema real sem fazer promessas extras', certa: true },
+          { letra: 'C', texto: 'Informar que o canal correto é o Concierge e que contato direto com o CEO não é permitido', certa: false },
+          { letra: 'D', texto: 'Dizer que vai avisar o CEO sobre o contato para que ele esteja preparado', certa: false }
+        ],
+        feedback_certo: 'Manter calma, não reagir à ameaça, registrar tudo e escalar ao coordenador. A franqueada tem o direito de acionar quem quiser — o analista não bloqueia nem pressiona. Foca em resolver o problema real.',
+        feedback_errado: 'Nunca reaja a ameaças de contato com liderança. O analista mantém o tom profissional, registra tudo, escala ao coordenador e foca em resolver o problema real — sem pressionar nem bloquear.',
+        resposta_sistema: 'Mônica, entendo que está frustrada e respeito sua decisão. Enquanto isso, vou escalar agora para minha coordenação e garantir que o seu problema seja resolvido com prioridade. Você vai receber uma resposta ainda hoje. Estou registrando tudo para acompanhamento. 🙏'
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════
+  // CASO 11 — FRANQUEADO COM PROBLEMA DE FURTO (hipotético / RH)
+  // ══════════════════════════════════════════════════════════
+  {
+    id: 11,
+    franqueado: { nome: 'Gustavo Pereira', cidade: 'Curitiba — PR', avatar: 'GP' },
+    fases: [
+      {
+        tipo: 'triagem',
+        pill: 'Fase 1 — Triagem',
+        titulo: 'Como você age com essa informação?',
+        sub: 'Avalie corretamente.',
+        mensagem: 'Descobri que minha funcionária está furtando dinheiro do caixa. Quero demiti-la por justa causa agora!',
+        opcoes: [
+          { letra: 'A', texto: 'Orientar a demitir imediatamente, pois furto é justa causa garantida', certa: false },
+          { letra: 'B', texto: 'Orientar a reunir as provas primeiro (câmeras, conferência de caixa, testemunhas), consultar advogado trabalhista sobre justa causa por improbidade antes de qualquer comunicação, e registrar tudo', certa: true },
+          { letra: 'C', texto: 'Abrir um ticket para o RH da franqueadora assumir o processo de demissão', certa: false },
+          { letra: 'D', texto: 'Aplicar três advertências por escrito antes de formalizar a justa causa', certa: false }
+        ],
+        feedback_certo: 'Correto! Nunca demitir no calor do momento. Reunir provas, consultar advogado trabalhista ANTES de qualquer comunicação ao colaborador. Justa causa mal aplicada é revertida na Justiça.',
+        feedback_errado: 'Nunca demitir no calor do momento. Sem prova robusta, a justa causa é revertida na Justiça — o custo de uma ação trabalhista é muito maior. O analista orienta a reunir provas e consultar advogado ANTES de qualquer ação.',
+        resposta_sistema: 'Gustavo, entendo a indignação — mas atenção: nunca demita por justa causa no calor do momento. Primeiro: reúna as provas (câmeras, conferência de caixa, testemunhas). Depois, consulte um advogado trabalhista sobre a aplicação de justa causa por improbidade (Art. 482 da CLT) ANTES de qualquer comunicação para a funcionária. Sem prova robusta, a justa causa pode ser revertida na Justiça.'
+      },
+      {
+        tipo: 'resposta',
+        pill: 'Fase 2 — Resposta',
+        titulo: 'Ele pergunta se a Cresci e Perdi vai arcar com os custos.',
+        sub: 'Qual é a resposta correta sobre responsabilidade trabalhista?',
+        mensagem: 'Se ela entrar com processo contra mim, a Cresci e Perdi me apoia juridicamente?',
+        opcoes: [
+          { letra: 'A', texto: '"Sim, a franqueadora oferece suporte jurídico nos casos de ação trabalhista contra unidades."', certa: false },
+          { letra: 'B', texto: '"Cada unidade responde pelas suas próprias obrigações trabalhistas — a franqueadora não é parte da ação. Recomendo contratar advogado trabalhista de confiança. Posso indicar a Dra. Marlete Barros."', certa: true },
+          { letra: 'C', texto: '"Depende do caso — vou verificar com o Jurídico."', certa: false },
+          { letra: 'D', texto: '"A franqueadora pode apoiar informalmente, mas não juridicamente."', certa: false }
+        ],
+        feedback_certo: 'O franqueado é o empregador — a franqueadora não é parte em ações trabalhistas. Informar isso claramente e oferecer a indicação do advogado é o protocolo correto.',
+        feedback_errado: 'O franqueado é o empregador e responde pelas suas próprias obrigações. A franqueadora não assume passivo trabalhista das unidades. O analista informa isso claramente e pode indicar a Dra. Marlete Barros.',
+        resposta_sistema: 'Gustavo, importante deixar claro: cada unidade responde pelas suas próprias obrigações trabalhistas — a franqueadora não é parte na ação. Por isso, é ainda mais importante ter um advogado trabalhista desde o início. Posso indicar a Dra. Marlete Barros: +55 11 98228-6753 — ela é de confiança da nossa rede.'
+      },
+      {
+        tipo: 'escrita',
+        pill: 'Fase 3 — Resposta Livre',
+        titulo: 'Orientação final sobre a situação',
+        sub: 'Ele pergunta se pode demitir sem justa causa agora para evitar complicações. Escreva sua orientação completa.',
+        mensagem: 'E se eu demitir sem justa causa agora para evitar complicação? Qual o risco?',
+        campo_label: 'Sua resposta para o Gustavo:',
+        campo_placeholder: 'Escreva aqui como orientaria sobre demissão sem justa causa...',
+        avaliacao_prompt: `Você é um supervisor de qualidade de atendimento da Cresci e Perdi. Um colaborador em treinamento escreveu a seguinte resposta para um franqueado que pergunta sobre os riscos de demitir sem justa causa:
+
+RESPOSTA DO COLABORADOR: "{resposta}"
+
+O protocolo correto é: explicar que demissão sem justa causa é a forma mais segura juridicamente (aviso prévio + saldo + férias prop. + 13º prop. + 40% FGTS + seguro desemprego), mas alertar que o franqueado continua responsável pelas verbas rescisórias. O analista pode dar essa orientação geral mas NUNCA substitui o advogado trabalhista. Deve sempre reforçar que a decisão final deve ser tomada com orientação jurídica especializada.
+
+Avalie em 3 critérios (de 0 a 10):
+1. CONTEÚDO: o colaborador explicou que sem justa causa é mais seguro juridicamente, mencionou as verbas rescisórias e orientou a consultar advogado?
+2. TOM: foi direto, sem julgamento, e equilibrado entre informar e não dar aconselhamento jurídico?
+3. PORTUGUÊS: gramática, concordância e clareza estão adequadas para comunicação profissional?
+
+Responda APENAS em JSON válido:
+{"conteudo": número, "tom": número, "portugues": número, "feedback": "texto de até 3 linhas", "aprovado": true ou false}
+
+Aprovado se média >= 6.`,
+        resposta_sistema: 'Gustavo, a demissão sem justa causa é geralmente a opção mais segura juridicamente, pois evita a contestação da justa causa na Justiça. As verbas incluem: aviso prévio, saldo de salário, férias proporcionais, 13º proporcional, multa de 40% sobre o FGTS e seguro desemprego. Mas a decisão final deve ser tomada com o advogado trabalhista — ele vai avaliar o seu caso específico e a prova disponível.'
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════
+  // CASO 12 — LGPD E SEGURANÇA DE DADOS (cotidiano / óbvio mas gera dúvida)
+  // ══════════════════════════════════════════════════════════
+  {
+    id: 12,
+    franqueado: { nome: 'Aline Rodrigues', cidade: 'Florianópolis — SC', avatar: 'AR' },
+    fases: [
+      {
+        tipo: 'triagem',
+        pill: 'Fase 1 — Triagem',
+        titulo: 'Como você orienta sobre segurança de dados?',
+        sub: 'Avalie a situação e identifique o protocolo correto.',
+        mensagem: 'Uma ex-funcionária que foi demitida ontem ainda está acessando o sistema da loja. O que devo fazer?',
+        opcoes: [
+          { letra: 'A', texto: 'Orientar a bloquear a ex-funcionária nas redes sociais da loja', certa: false },
+          { letra: 'B', texto: 'Revogar o acesso imediatamente pelo GiraNet (ícone superior direito → Equipe → três pontinhos → Desativar), e alertar que manter acesso de colaborador desligado é violação da LGPD', certa: true },
+          { letra: 'C', texto: 'Abrir ticket para a Automação bloquear o acesso remotamente', certa: false },
+          { letra: 'D', texto: 'Aguardar o prazo de 30 dias antes de revogar o acesso conforme a legislação', certa: false }
+        ],
+        feedback_certo: 'Revogar imediatamente é a obrigação — não prazo. O GiraNet permite desativar pelo próprio app. Manter acesso de colaborador desligado é violação da LGPD.',
+        feedback_errado: 'O acesso de colaborador desligado deve ser revogado IMEDIATAMENTE — não em 30 dias. O GiraNet permite desativar diretamente: ícone superior direito → Equipe → três pontinhos → Desativar. Isso é obrigação da LGPD.',
+        resposta_sistema: 'Aline, isso precisa ser resolvido agora! No app GiraNet: clique no ícone do GiraNet no canto superior direito → Equipe → identifique a ex-colaboradora → três pontinhos → Desativar. Manter o acesso de colaborador desligado é violação da LGPD e pode comprometer dados financeiros da operação.'
+      },
+      {
+        tipo: 'resposta',
+        pill: 'Fase 2 — Resposta',
+        titulo: 'Ela pergunta se pode salvar dados de clientes numa planilha.',
+        sub: 'Qual é a orientação correta sobre proteção de dados?',
+        mensagem: 'Posso salvar os CPFs dos clientes do GiraCrédito numa planilha do Excel para ter um backup?',
+        opcoes: [
+          { letra: 'A', texto: '"Pode, desde que a planilha fique salva apenas no computador da loja, sem acesso externo."', certa: false },
+          { letra: 'B', texto: '"Nunca. Dados de clientes (especialmente CPFs) são protegidos pela LGPD. Salvar em planilhas externas ao sistema é proibido — risco de multa e processos contra a unidade."', certa: true },
+          { letra: 'C', texto: '"Pode guardar em planilha se tiver senha de proteção no arquivo."', certa: false },
+          { letra: 'D', texto: '"Vou verificar com a equipe de Automação se há alguma forma segura de fazer isso."', certa: false }
+        ],
+        feedback_certo: 'Correto! Nunca salvar dados de clientes em planilhas ou documentos externos ao sistema. Isso é proibido pela LGPD e pode resultar em multa e processos contra a unidade.',
+        feedback_errado: 'Nunca salvar dados de clientes (especialmente CPFs) em planilhas externas ao sistema — independente de senha ou acesso restrito. Isso é proibido pela LGPD.',
+        resposta_sistema: 'Aline, nunca faça isso! Os CPFs dos clientes são dados sensíveis protegidos pela LGPD. Salvar em planilhas ou documentos externos ao sistema é proibido — e pode resultar em multa e processos contra a sua unidade. Os dados devem ficar apenas dentro dos sistemas homologados da rede.'
+      },
+      {
+        tipo: 'escrita',
+        pill: 'Fase 3 — Resposta Livre',
+        titulo: 'Situação hipotética de segurança',
+        sub: 'Ela diz que usa a mesma senha em todos os sistemas há 2 anos e nunca trouxe problema. Como você responde?',
+        mensagem: 'Aliás, uso a mesma senha no GiraNet, no DFCOM e no e-mail da loja há 2 anos. Nunca tive problema.',
+        campo_label: 'Sua resposta para a Aline:',
+        campo_placeholder: 'Escreva aqui como orientaria sobre segurança de senhas...',
+        avaliacao_prompt: `Você é um supervisor de qualidade de atendimento da Cresci e Perdi. Um colaborador em treinamento escreveu a seguinte resposta para uma franqueada que usa a mesma senha em todos os sistemas há 2 anos:
+
+RESPOSTA DO COLABORADOR: "{resposta}"
+
+O protocolo correto é: alertar que usar a mesma senha em sistemas diferentes é uma prática de alto risco (se uma senha for comprometida, todos os sistemas ficam vulneráveis), informar que senhas devem ser trocadas a cada 90 dias e nunca reutilizadas entre sistemas diferentes. O analista não precisa ser alarmista, mas precisa ser direto sobre o risco real.
+
+Avalie em 3 critérios (de 0 a 10):
+1. CONTEÚDO: o colaborador explicou o risco real de reutilizar senhas e orientou a trocar imediatamente com senhas diferentes por sistema?
+2. TOM: foi direto sem ser alarmista, mantendo postura de parceria?
+3. PORTUGUÊS: gramática, concordância e clareza estão adequadas para comunicação profissional?
+
+Responda APENAS em JSON válido:
+{"conteudo": número, "tom": número, "portugues": número, "feedback": "texto de até 3 linhas", "aprovado": true ou false}
+
+Aprovado se média >= 6.`,
+        resposta_sistema: 'Aline, "nunca ter tido problema" não significa que está seguro — significa que ainda não foi atacada! Usar a mesma senha em todos os sistemas é um risco alto: se uma senha for descoberta, todos os sistemas ficam expostos de uma vez. O protocolo é trocar senhas a cada 90 dias e usar senhas diferentes para cada sistema. Recomendo fazer isso hoje! 🔐'
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════
+  // CASO 13 — FRANQUEADO COM DIFICULDADE DE TREINAMENTO (cotidiano)
+  // ══════════════════════════════════════════════════════════
+  {
+    id: 13,
+    franqueado: { nome: 'Tatiane Oliveira', cidade: 'Vitória — ES', avatar: 'TO' },
+    fases: [
+      {
+        tipo: 'triagem',
+        pill: 'Fase 1 — Triagem',
+        titulo: 'Como você age com essa situação?',
+        sub: 'Avalie a gravidade e o encaminhamento.',
+        mensagem: 'Contratei uma funcionária há 40 dias e ela ainda não fez o treinamento da plataforma. Não teve tempo.',
+        opcoes: [
+          { letra: 'A', texto: 'Dizer que o prazo é de 60 dias e ainda há tempo', certa: false },
+          { letra: 'B', texto: 'Alertar que o prazo de 30 dias já foi ultrapassado — isso é obrigação contratual do franqueado e pode ser registrado nas vistorias de campo. Orientar a iniciar imediatamente e abrir ticket para Automação se houver problema de acesso', certa: true },
+          { letra: 'C', texto: 'Dizer que o treinamento é recomendado mas não obrigatório', certa: false },
+          { letra: 'D', texto: 'Abrir um ticket para o RH da franqueadora cobrar o treinamento', certa: false }
+        ],
+        feedback_certo: 'Correto! O prazo é de 30 dias — já ultrapassado. Isso é obrigação contratual, não sugestão. O franqueado deve iniciar imediatamente e o descumprimento pode ser registrado nas vistorias.',
+        feedback_errado: 'O prazo de treinamento inicial é 30 dias após a admissão — não 60. Já foi ultrapassado. Isso é obrigação contratual que pode ser registrada nas vistorias de campo. O analista alerta com clareza.',
+        resposta_sistema: 'Tatiane, atenção: o prazo para conclusão do treinamento inicial é de 30 dias após a admissão — e com 40 dias, já ultrapassou. Isso não é sugestão, é obrigação contratual que pode ser registrada nas vistorias de campo. Oriente a colaboradora a iniciar hoje. Se houver problema de acesso à plataforma, abra um ticket pelo GiraBot para a equipe de Automação.'
+      },
+      {
+        tipo: 'resposta',
+        pill: 'Fase 2 — Resposta',
+        titulo: 'Ela diz que o treinamento é muito longo. Como você responde?',
+        sub: 'Qual é a argumentação correta?',
+        mensagem: 'Mas o treinamento é muito longo e chato. Ela já aprendeu na prática, precisa mesmo fazer?',
+        opcoes: [
+          { letra: 'A', texto: '"Entendo que é longo, mas é obrigação contratual. Não há exceção."', certa: false },
+          { letra: 'B', texto: '"O colaborador que pula o treinamento improvisa e cria vícios difíceis de corrigir, o que gera erros operacionais recorrentes que prejudicam a experiência do cliente. O franqueado acaba gastando mais tempo corrigindo do que teria gasto treinando desde o início — além da responsabilidade contratual."', certa: true },
+          { letra: 'C', texto: '"Ela pode fazer apenas os módulos que achar mais relevantes."', certa: false },
+          { letra: 'D', texto: '"Vou verificar se há uma versão reduzida do treinamento disponível."', certa: false }
+        ],
+        feedback_certo: 'Essa é a argumentação do manual — explica o custo real de não treinar: vícios, erros operacionais, tempo corrigindo. Transforma a obrigação em argumento de resultado.',
+        feedback_errado: 'A resposta correta usa a argumentação do manual: vícios difíceis de corrigir, erros operacionais que prejudicam o cliente, e mais tempo corrigindo do que treinando. "É obrigação" sozinho não gera adesão.',
+        resposta_sistema: 'Tatiane, entendo que parece longo — mas o colaborador que pula o treinamento começa a improvisar e cria vícios muito difíceis de corrigir depois. Isso gera erros operacionais que prejudicam a experiência do cliente. Na prática, você vai gastar muito mais tempo corrigindo erros do que teria gasto no treinamento desde o início. Vale muito a pena!'
+      },
+      {
+        tipo: 'escrita',
+        pill: 'Fase 3 — Resposta Livre',
+        titulo: 'Situação hipotética de escala',
+        sub: 'Ela diz que vai reduzir a equipe nos horários de pico para economizar. Escreva sua orientação.',
+        mensagem: 'Aliás, tô pensando em colocar só uma pessoa nos horários de pico para cortar custo. O que acha?',
+        campo_label: 'Sua resposta para a Tatiane:',
+        campo_placeholder: 'Escreva aqui como orientaria sobre escala em horários de pico...',
+        avaliacao_prompt: `Você é um supervisor de qualidade de atendimento da Cresci e Perdi. Um colaborador em treinamento escreveu a seguinte resposta para uma franqueada que quer reduzir equipe nos horários de pico para economizar:
+
+RESPOSTA DO COLABORADOR: "{resposta}"
+
+O protocolo correto é: alertar que reduzir equipe em horário de pico é um erro estratégico — o custo da má experiência do cliente é muito maior do que o custo da mão de obra economizada. O manual é claro: horários de pico precisam de reforço, nunca de redução. O analista pode usar essa argumentação sem dar aconselhamento jurídico.
+
+Avalie em 3 critérios (de 0 a 10):
+1. CONTEÚDO: o colaborador alertou claramente que reduzir equipe em pico é contraproducente e explicou o custo real da má experiência do cliente?
+2. TOM: foi direto mas parceiro, sem julgar a decisão da franqueada?
+3. PORTUGUÊS: gramática, concordância e clareza estão adequadas para comunicação profissional?
+
+Responda APENAS em JSON válido:
+{"conteudo": número, "tom": número, "portugues": número, "feedback": "texto de até 3 linhas", "aprovado": true ou false}
+
+Aprovado se média >= 6.`,
+        resposta_sistema: 'Tatiane, essa é uma decisão que pode sair mais cara do que parece! Horários de pico precisam de reforço — nunca de redução. O custo da má experiência do cliente (fila, atendimento ruim, perda de venda) é muito maior do que o custo da mão de obra que você economizaria. A regra é: nunca reduza a equipe no pico para economizar. Se o problema é custo, o caminho é otimizar a escala nos horários de baixo movimento.'
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════
+  // CASO 14 — SITUAÇÃO HIPOTÉTICA DE CONCORRÊNCIA (estratégico)
+  // ══════════════════════════════════════════════════════════
+  {
+    id: 14,
+    franqueado: { nome: 'Felipe Martins', cidade: 'São Luís — MA', avatar: 'FM' },
+    fases: [
+      {
+        tipo: 'triagem',
+        pill: 'Fase 1 — Triagem',
+        titulo: 'Como você age com essa informação?',
+        sub: 'Defina prioridade e encaminhamento.',
+        mensagem: 'Um concorrente direto vai abrir uma loja a 300 metros da minha daqui a 2 meses. O que eu faço?',
+        opcoes: [
+          { letra: 'A', texto: 'Dizer que o franqueado deve aguardar a inauguração para medir o impacto real antes de agir', certa: false },
+          { letra: 'B', texto: 'Orientar a comunicar a franqueadora IMEDIATAMENTE — um plano de ação conjunto será criado, com eventos e patrocínio diários para fidelizar os clientes antes da inauguração do concorrente', certa: true },
+          { letra: 'C', texto: 'Orientar a fazer um evento de 50% OFF para criar barreira de preço contra o concorrente', certa: false },
+          { letra: 'D', texto: 'Dizer que a franqueadora não interfere na estratégia competitiva local', certa: false }
+        ],
+        feedback_certo: 'Comunicar IMEDIATAMENTE à franqueadora para um plano conjunto. A abordagem correta é agir ANTES da inauguração — eventos e patrocínio diários para fidelizar os clientes. Evento de preço é a ÚLTIMA etapa, não o começo.',
+        feedback_errado: 'O protocolo do manual é claro: comunicar IMEDIATAMENTE à franqueadora para um plano de ação conjunto. A abordagem é agir ANTES da inauguração, com eventos diários. Evento de preço é a última etapa — nunca o início do plano.',
+        resposta_sistema: 'Felipe, ótimo que identificou isso com antecedência! A orientação é comunicar a franqueadora AGORA — não esperar a inauguração. A partir desse aviso, um plano de ação específico será criado e acompanhado em conjunto, com eventos e patrocínio diários para que os clientes já estejam fidelizados quando o concorrente abrir. Abra um ticket agora para a equipe de Operação!'
+      },
+      {
+        tipo: 'resposta',
+        pill: 'Fase 2 — Resposta',
+        titulo: 'Ele quer fazer um evento de 50% em toda a loja para "matar" a concorrência.',
+        sub: 'Como você orienta?',
+        mensagem: 'Quero fazer um evento de 50% em tudo agora para fidelizar todo mundo antes do concorrente abrir!',
+        opcoes: [
+          { letra: 'A', texto: '"Ótima ideia! Mas precisa de aprovação da franqueadora primeiro."', certa: false },
+          { letra: 'B', texto: '"O botão de 50% no caixa é exclusivo para eventos nacionais específicos ou unidades em encerramento — não está disponível para uso livre. Como sugestão, posso te orientar sobre eventos disponíveis no Dashboard que geram o mesmo efeito dentro das diretrizes."', certa: true },
+          { letra: 'C', texto: '"Pode usar o botão de desconto do caixa para isso."', certa: false },
+          { letra: 'D', texto: '"Evento de preço antes de concorrente inaugurar não é recomendado pelo manual."', certa: false }
+        ],
+        feedback_certo: 'Correto! O botão de 50% é exclusivo para situações específicas. O analista não valida a ideia, explica a restrição e oferece alternativa concreta dentro das diretrizes.',
+        feedback_errado: 'O botão de 50% no caixa é exclusivo para eventos nacionais específicos ou unidades em encerramento. O analista não pode validar — e a resposta correta oferece uma alternativa concreta dentro das diretrizes.',
+        resposta_sistema: 'Felipe, entendo a urgência! Mas o desconto de 50% em toda a loja não está disponível para uso livre — é exclusivo para situações específicas e unidades em encerramento. O que funciona muito bem para o seu objetivo: posso te mostrar os eventos disponíveis no Dashboard que geram grande fluxo dentro das diretrizes. O plano de ação com patrocínio diário vai ser muito mais eficaz do que desconto pontual!'
+      },
+      {
+        tipo: 'escrita',
+        pill: 'Fase 3 — Resposta Livre',
+        titulo: 'Orientação hipotética sobre o pós-inauguração do concorrente',
+        sub: 'Ele pergunta: "E se mesmo com tudo isso o concorrente me roubar clientes depois que abrir?" — Escreva sua resposta estratégica.',
+        mensagem: 'E se mesmo com tudo isso o concorrente me roubar clientes depois que abrir?',
+        campo_label: 'Sua resposta para o Felipe:',
+        campo_placeholder: 'Escreva aqui como responderia sobre a estratégia pós-abertura do concorrente...',
+        avaliacao_prompt: `Você é um supervisor de qualidade de atendimento da Cresci e Perdi. Um colaborador em treinamento escreveu a seguinte resposta para um franqueado preocupado com a perda de clientes após a abertura de um concorrente:
+
+RESPOSTA DO COLABORADOR: "{resposta}"
+
+O protocolo correto é: transmitir confiança no plano de ação da rede, lembrar que o objetivo é que o concorrente já encontre os clientes fidelizados (não chegar com força), e reforçar que o acompanhamento será conjunto com a franqueadora. O analista não deve dar garantias de resultado, mas deve reforçar o poder do plano de ação e da parceria com a rede.
+
+Avalie em 3 critérios (de 0 a 10):
+1. CONTEÚDO: o colaborador transmitiu confiança no plano, explicou a lógica de fidelização antes da abertura e reforçou a parceria com a rede?
+2. TOM: foi estratégico e motivador sem fazer promessas falsas?
+3. PORTUGUÊS: gramática, concordância e clareza estão adequadas para comunicação profissional?
+
+Responda APENAS em JSON válido:
+{"conteudo": número, "tom": número, "portugues": número, "feedback": "texto de até 3 linhas", "aprovado": true ou false}
+
+Aprovado se média >= 6.`,
+        resposta_sistema: 'Felipe, o objetivo de todo o plano é exatamente esse: que o concorrente não chegue a inaugurar com força — porque os seus clientes já estarão fidelizados. Quando você tem presença constante com eventos e patrocínio diários, os clientes já têm um relacionamento estabelecido com a sua loja. A Cresci e Perdi vai acompanhar esse processo junto com você — não é uma batalha que você trava sozinho. Vamos fazer isso juntos! 💪'
+      }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════
+  // CASO 15 — SITUAÇÃO HIPOTÉTICA COMPLEXA (sem resposta no manual)
+  // ══════════════════════════════════════════════════════════
+  {
+    id: 15,
+    franqueado: { nome: 'Sandra Lima', cidade: 'Belém — PA', avatar: 'SL' },
+    fases: [
+      {
+        tipo: 'triagem',
+        pill: 'Fase 1 — Triagem',
+        titulo: 'Situação inédita. Como você age?',
+        sub: 'Esse caso não está descrito nos manuais. O que você faz?',
+        mensagem: 'Um cliente entrou na loja dizendo que vai processar a Cresci e Perdi porque comprou um produto com defeito e diz que isso configura propaganda enganosa. Ele tem advogado.',
+        opcoes: [
+          { letra: 'A', texto: 'Tentar negociar com o cliente um reembolso imediato para evitar o processo', certa: false },
+          { letra: 'B', texto: 'Dizer ao cliente que vai verificar internamente e ligar para ele depois', certa: false },
+          { letra: 'C', texto: 'Escalar imediatamente ao coordenador + área Jurídica (ameaça de processo = escalada imediata), registrar tudo no ticket com detalhes, manter tom profissional com o cliente e NÃO fazer nenhum acordo verbal', certa: true },
+          { letra: 'D', texto: 'Dizer ao cliente que o problema é responsabilidade do franqueado, não da Cresci e Perdi', certa: false }
+        ],
+        feedback_certo: 'Ameaça de processo judicial = escalada imediata ao coordenador + Jurídico. Registrar tudo com detalhes, manter tom profissional, NÃO fazer acordo verbal sobre matéria jurídica. Nunca tentar resolver juridicamente sem orientação.',
+        feedback_errado: 'Qualquer ameaça de processo judicial = escalada imediata ao coordenador + área Jurídica. O analista registra tudo, mantém o tom profissional com o cliente e NÃO faz acordos verbais. Nunca tentar resolver juridicamente sem orientação especializada.',
+        resposta_sistema: 'Sandra, não faça nenhum acordo verbal agora. Mantenha o tom educado com o cliente e informe que o caso será analisado internamente. Vou registrar tudo agora e escalar imediatamente ao coordenador e à área jurídica. Enquanto aguarda orientação, não faça nenhuma promessa ou concessão ao cliente.'
+      },
+      {
+        tipo: 'resposta',
+        pill: 'Fase 2 — Resposta',
+        titulo: 'Ela pergunta o que falar para o cliente que está na loja.',
+        sub: 'Qual é a fala correta enquanto aguarda orientação jurídica?',
+        mensagem: 'E o que eu falo para ele agora? Ele está aqui na loja esperando uma resposta.',
+        opcoes: [
+          { letra: 'A', texto: '"Diz a ele que vamos trocar o produto ou devolver o dinheiro para evitar problema."', certa: false },
+          { letra: 'B', texto: '"Informe ao cliente que o caso foi registrado e que a equipe responsável entrará em contato em breve com um posicionamento. Seja cordial, ouça sem confirmar nem negar nada, e não faça nenhum acordo."', certa: true },
+          { letra: 'C', texto: '"Diz que não é possível falar sobre isso sem advogado presente."', certa: false },
+          { letra: 'D', texto: '"Peça para ele voltar amanhã quando tiver uma resposta."', certa: false }
+        ],
+        feedback_certo: 'Correto! Ser cordial, ouvir, registrar o caso, informar que haverá um posicionamento — sem confirmar, negar ou fazer acordos. Manter o cliente informado sem comprometer juridicamente.',
+        feedback_errado: 'A postura correta é ser cordial, ouvir sem confirmar nem negar nada, registrar e informar que haverá um posicionamento. Nunca fazer acordo verbal nem ser agressivo — nem pedir para voltar amanhã sem dar nenhum prazo.',
+        resposta_sistema: 'Sandra, oriente sua equipe a ser cordial com o cliente: "Registramos sua reclamação e nossa equipe responsável vai analisar e entrar em contato com você em breve com um posicionamento." Ouça o cliente com atenção, anote tudo, mas NÃO confirme, negue ou faça qualquer acordo. Mantenha o tom calmo e profissional.'
+      },
+      {
+        tipo: 'escrita',
+        pill: 'Fase 3 — Resposta Livre',
+        titulo: 'Caso inédito — raciocínio livre',
+        sub: 'Ela pergunta: "E se isso virar notícia? Uma vizinha disse que vai postar no Instagram chamando a loja de golpista." — Escreva como você agiria.',
+        mensagem: 'Uma vizinha que estava na loja disse que vai postar no Instagram chamando minha loja de golpista. Isso pode viralizar!',
+        campo_label: 'Sua resposta para a Sandra:',
+        campo_placeholder: 'Escreva aqui como você agiria com essa ameaça de crise de imagem...',
+        avaliacao_prompt: `Você é um supervisor de qualidade de atendimento da Cresci e Perdi. Um colaborador em treinamento escreveu a seguinte resposta para uma franqueada ameaçada de crise de imagem pública nas redes sociais:
+
+RESPOSTA DO COLABORADOR: "{resposta}"
+
+O protocolo correto de crise de imagem é: PARAR e não responder nada publicamente, documentar tudo com prints, escalar IMEDIATAMENTE ao coordenador e equipe de Marketing/Diretoria, garantir que apenas UMA VOZ fale externamente durante a crise, e NÃO especular sobre causas ou responsabilidades. O analista nunca orienta o franqueado a responder publicamente sem orientação da franqueadora.
+
+Avalie em 3 critérios (de 0 a 10):
+1. CONTEÚDO: o colaborador orientou corretamente a não responder publicamente, documentar, escalar ao coordenador e Marketing, e aguardar orientação?
+2. TOM: transmitiu calma e controle sem minimizar a gravidade da situação?
+3. PORTUGUÊS: gramática, concordância e clareza estão adequadas para comunicação profissional?
+
+Responda APENAS em JSON válido:
+{"conteudo": número, "tom": número, "portugues": número, "feedback": "texto de até 3 linhas", "aprovado": true ou false}
+
+Aprovado se média >= 6.`,
+        resposta_sistema: 'Sandra, protocolo de crise: PARE — não responda nada publicamente agora. Faça prints de tudo com data e hora. Estou escalando IMEDIATAMENTE ao coordenador e à equipe de Marketing. Apenas UM canal oficial vai se comunicar externamente durante a crise. Não especule sobre causas nem responsabilidades — aguarde a orientação da franqueadora antes de qualquer resposta pública. Estou contigo! 🙏'
+      }
+    ]
+  }
+];
+
+// ─── ESTADO ───────────────────────────────────────────────────────────────
+const TOTAL_CASOS = 15;
+let nomeColaborador = '';
+let casoAtual = 0;
+let faseAtual = 0;
+let acertosTotais = 0;
+let errosTotais = 0;
+let pontosTotais = 0;
+let resultadosPorCaso = [];
+let pontosNoCaso = 0;
+let acertosNoCaso = 0;
+let aguardandoIA = false;
+
+// ─── INICIAR ──────────────────────────────────────────────────────────────
+function iniciarSimulador() {
+  const nome = document.getElementById('input-nome').value.trim();
+  if (!nome) {
+    document.getElementById('erro-nome').style.display = 'block';
+    return;
+  }
+  nomeColaborador = nome;
+  document.getElementById('tela-inicio').style.display = 'none';
+  document.getElementById('tela-simulador').style.display = 'block';
+  document.getElementById('sim-nome').textContent = nome;
+  document.getElementById('sim-caso-num').textContent = '1';
+  // Atualizar textos da tela de início
+  carregarCaso();
+}
+
+// ─── CARREGAR CASO ────────────────────────────────────────────────────────
+function carregarCaso() {
+  const caso = CASOS[casoAtual];
+  faseAtual = 0;
+  pontosNoCaso = 0;
+  acertosNoCaso = 0;
+
+  document.getElementById('sim-caso-num').textContent = casoAtual + 1;
+  document.getElementById('barra-fill').style.width = `${(casoAtual / TOTAL_CASOS) * 100}%`;
+
+  document.getElementById('chat-avatar').textContent = caso.franqueado.avatar;
+  document.getElementById('chat-nome-franqueado').textContent = caso.franqueado.nome;
+  document.getElementById('chat-cidade').textContent = caso.franqueado.cidade;
+  document.getElementById('chat-mensagens').innerHTML = '';
+
+  setTimeout(() => {
+    adicionarMensagemFranqueado(caso.fases[0].mensagem);
+    setTimeout(() => carregarFase(), 800);
+  }, 400);
+}
+
+// ─── CARREGAR FASE ────────────────────────────────────────────────────────
+function carregarFase() {
+  const caso = CASOS[casoAtual];
+  const fase = caso.fases[faseAtual];
+
+  document.getElementById('fase-pill').textContent = fase.pill;
+  document.getElementById('decisao-titulo').textContent = fase.titulo;
+  document.getElementById('decisao-sub').textContent = fase.sub;
+  document.getElementById('feedback-box').style.display = 'none';
+  document.getElementById('btn-proximo').style.display = 'none';
+
+  const lista = document.getElementById('opcoes-lista');
+  lista.innerHTML = '';
+
+  if (fase.tipo === 'escrita') {
+    // Campo de texto livre
+    lista.innerHTML = `
+      <div style="margin-bottom:.5rem;">
+        <label style="display:block;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--texto2);margin-bottom:.5rem;">${fase.campo_label}</label>
+        <textarea id="campo-escrita" placeholder="${fase.campo_placeholder}"
+          style="width:100%;min-height:120px;padding:.85rem 1rem;background:var(--escuro3);border:1.5px solid var(--borda);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:.88rem;color:var(--texto);resize:vertical;outline:none;line-height:1.55;transition:border-color .2s;"
+          onfocus="this.style.borderColor='var(--verde-claro)'" onblur="this.style.borderColor='var(--borda)'"></textarea>
+      </div>
+      <button onclick="avaliarEscrita()" id="btn-avaliar"
+        style="width:100%;padding:.85rem;background:var(--verde);color:white;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:.5rem;">
+        ✦ Avaliar com IA →
+      </button>
+      <div id="ia-status" style="text-align:center;font-size:.78rem;color:var(--texto2);margin-top:.5rem;display:none;">⏳ Analisando sua resposta...</div>`;
+  } else {
+    // Múltipla escolha
+    const letras = ['A','B','C','D'];
+    fase.opcoes.forEach((op, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'opcao-btn';
+      btn.onclick = () => responderOpcao(i);
+      btn.innerHTML = `<div class="opcao-letra">${letras[i]}</div><span>${op.texto}</span>`;
+      lista.appendChild(btn);
+    });
+  }
+}
+
+// ─── RESPONDER MÚLTIPLA ESCOLHA ───────────────────────────────────────────
+function responderOpcao(idx) {
+  const caso = CASOS[casoAtual];
+  const fase = caso.fases[faseAtual];
+  const opcoes = document.querySelectorAll('.opcao-btn');
+
+  opcoes.forEach(b => b.disabled = true);
+
+  const acertou = fase.opcoes[idx].certa;
+
+  opcoes.forEach((btn, i) => {
+    if (fase.opcoes[i].certa) {
+      if (i === idx && acertou) btn.classList.add('certa');
+      else if (!acertou) btn.classList.add('mostrar-certa');
+    }
+    if (i === idx && !acertou) btn.classList.add('errada');
+  });
+
+  registrarResultado(acertou, 10);
+
+  const fb = document.getElementById('feedback-box');
+  fb.className = `feedback-box ${acertou ? 'certo' : 'errado'}`;
+  fb.style.display = 'block';
+  document.getElementById('feedback-titulo').innerHTML = acertou
+    ? `✓ Correto! <span class="pontos-flash mais">+10 pts</span>`
+    : `✗ Resposta incorreta <span class="pontos-flash zero">+0 pts</span>`;
+  document.getElementById('feedback-texto').textContent = acertou ? fase.feedback_certo : fase.feedback_errado;
+
+  setTimeout(() => adicionarMensagemSistema(fase.resposta_sistema), 600);
+  setTimeout(() => { document.getElementById('btn-proximo').style.display = 'block'; }, 800);
+}
+
+// ─── AVALIAR ESCRITA COM IA ───────────────────────────────────────────────
+async function avaliarEscrita() {
+  if (aguardandoIA) return;
+
+  const resposta = (document.getElementById('campo-escrita')?.value || '').trim();
+  if (!resposta) {
+    alert('Escreva sua resposta antes de avaliar!');
+    return;
+  }
+
+  aguardandoIA = true;
+  const caso = CASOS[casoAtual];
+  const fase = caso.fases[faseAtual];
+
+  document.getElementById('btn-avaliar').disabled = true;
+  document.getElementById('btn-avaliar').textContent = '⏳ Avaliando...';
+  document.getElementById('ia-status').style.display = 'block';
+  document.getElementById('campo-escrita').disabled = true;
+
+  const prompt = fase.avaliacao_prompt.replace('{resposta}', resposta);
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 500,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await res.json();
+    const raw = data.content[0].text.trim();
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const avaliacao = JSON.parse(clean);
+
+    const media = ((avaliacao.conteudo + avaliacao.tom + avaliacao.portugues) / 3).toFixed(1);
+    const acertou = avaliacao.aprovado === true;
+    const pontos = acertou ? 10 : 0;
+
+    registrarResultado(acertou, pontos);
+
+    // Mostrar resultado detalhado
+    const fb = document.getElementById('feedback-box');
+    fb.className = `feedback-box ${acertou ? 'certo' : 'errado'}`;
+    fb.style.display = 'block';
+    document.getElementById('feedback-titulo').innerHTML = acertou
+      ? `✓ Resposta aprovada pela IA! <span class="pontos-flash mais">+10 pts</span>`
+      : `✗ Resposta precisa melhorar <span class="pontos-flash zero">+0 pts</span>`;
+    document.getElementById('feedback-texto').innerHTML = `
+      <div style="display:flex;gap:.5rem;margin-bottom:.6rem;flex-wrap:wrap;">
+        <span style="background:rgba(255,255,255,.08);padding:.2rem .6rem;border-radius:6px;font-size:.75rem;">Conteúdo: ${avaliacao.conteudo}/10</span>
+        <span style="background:rgba(255,255,255,.08);padding:.2rem .6rem;border-radius:6px;font-size:.75rem;">Tom: ${avaliacao.tom}/10</span>
+        <span style="background:rgba(255,255,255,.08);padding:.2rem .6rem;border-radius:6px;font-size:.75rem;">Português: ${avaliacao.portugues}/10</span>
+        <span style="background:rgba(255,255,255,.08);padding:.2rem .6rem;border-radius:6px;font-size:.75rem;font-weight:700;">Média: ${media}/10</span>
+      </div>
+      <div style="font-size:.83rem;">${avaliacao.feedback}</div>`;
+
+    setTimeout(() => adicionarMensagemSistema(fase.resposta_sistema), 600);
+    setTimeout(() => { document.getElementById('btn-proximo').style.display = 'block'; }, 800);
+
+  } catch(e) {
+    // Fallback: avaliar localmente se a IA não responder
+    const tamanho = resposta.length;
+    const temConteudo = tamanho > 80;
+    const acertou = temConteudo;
+    const pontos = acertou ? 5 : 0; // meio ponto no fallback
+
+    registrarResultado(acertou, pontos);
+
+    const fb = document.getElementById('feedback-box');
+    fb.className = `feedback-box ${acertou ? 'certo' : 'errado'}`;
+    fb.style.display = 'block';
+    document.getElementById('feedback-titulo').innerHTML = acertou
+      ? `✓ Resposta registrada <span class="pontos-flash mais">+5 pts</span>`
+      : `✗ Resposta muito curta <span class="pontos-flash zero">+0 pts</span>`;
+    document.getElementById('feedback-texto').textContent = acertou
+      ? 'Resposta registrada para revisão do gestor. A avaliação detalhada de português e raciocínio será feita manualmente.'
+      : 'Sua resposta ficou muito curta. Em um atendimento real, o franqueado precisaria de uma orientação mais completa.';
+
+    setTimeout(() => adicionarMensagemSistema(fase.resposta_sistema), 600);
+    setTimeout(() => { document.getElementById('btn-proximo').style.display = 'block'; }, 800);
+  }
+
+  document.getElementById('ia-status').style.display = 'none';
+  aguardandoIA = false;
+}
+
+// ─── REGISTRAR RESULTADO ──────────────────────────────────────────────────
+function registrarResultado(acertou, pontos) {
+  if (acertou) {
+    acertosTotais++;
+    acertosNoCaso++;
+    pontosTotais += pontos;
+    pontosNoCaso += pontos;
+  } else {
+    errosTotais++;
+  }
+  document.getElementById('placar-acertos').textContent = acertosTotais;
+  document.getElementById('placar-erros').textContent = errosTotais;
+  document.getElementById('placar-pontos').textContent = pontosTotais;
+}
+
+// ─── PRÓXIMA FASE ─────────────────────────────────────────────────────────
+function proximaFase() {
+  const caso = CASOS[casoAtual];
+  faseAtual++;
+
+  if (faseAtual >= caso.fases.length) {
+    resultadosPorCaso.push({
+      nome: caso.franqueado.nome,
+      cidade: caso.franqueado.cidade,
+      acertos: acertosNoCaso,
+      pontos: pontosNoCaso
+    });
+
+    casoAtual++;
+
+    if (casoAtual >= CASOS.length) {
+      mostrarResultado();
+    } else {
+      document.getElementById('btn-proximo').style.display = 'none';
+      document.getElementById('feedback-box').style.display = 'none';
+      setTimeout(carregarCaso, 300);
+    }
+    return;
+  }
+
+  document.getElementById('btn-proximo').style.display = 'none';
+  document.getElementById('feedback-box').style.display = 'none';
+
+  setTimeout(() => {
+    adicionarMensagemFranqueado(caso.fases[faseAtual].mensagem);
+    setTimeout(() => carregarFase(), 600);
+  }, 300);
+}
+
+// ─── CHAT HELPERS ─────────────────────────────────────────────────────────
+function adicionarMensagemFranqueado(texto) {
+  const caso = CASOS[casoAtual];
+  const chat = document.getElementById('chat-mensagens');
+  const el = document.createElement('div');
+  el.className = 'msg franqueado';
+  el.innerHTML = `
+    <div class="msg-avatar">${caso.franqueado.avatar}</div>
+    <div>
+      <div class="msg-balao">${texto}</div>
+      <div class="msg-hora">${horaAtual()}</div>
+    </div>`;
+  chat.appendChild(el);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function adicionarMensagemSistema(texto) {
+  const chat = document.getElementById('chat-mensagens');
+  const digitando = document.createElement('div');
+  digitando.className = 'msg sistema';
+  digitando.id = 'digitando';
+  digitando.innerHTML = `
+    <div class="msg-avatar" style="background:var(--verde);">K</div>
+    <div class="msg-balao"><div class="digitando"><span></span><span></span><span></span></div></div>`;
+  chat.appendChild(digitando);
+  chat.scrollTop = chat.scrollHeight;
+
+  setTimeout(() => {
+    const d = document.getElementById('digitando');
+    if (d) d.remove();
+    const el = document.createElement('div');
+    el.className = 'msg sistema';
+    el.innerHTML = `
+      <div class="msg-avatar" style="background:var(--verde);">K</div>
+      <div>
+        <div class="msg-balao">${texto}</div>
+        <div class="msg-hora" style="text-align:right">${horaAtual()}</div>
+      </div>`;
+    chat.appendChild(el);
+    chat.scrollTop = chat.scrollHeight;
+  }, 1200);
+}
+
+function horaAtual() {
+  const now = new Date();
+  return `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+}
+
+// ─── RESULTADO FINAL ──────────────────────────────────────────────────────
+function mostrarResultado() {
+  document.getElementById('tela-simulador').style.display = 'none';
+  document.getElementById('tela-resultado').style.display = 'block';
+
+  const totalPossivel = TOTAL_CASOS * 30;
+  const pct = Math.round((pontosTotais / totalPossivel) * 100);
+
+  document.getElementById('res-nota').textContent = `${pontosTotais}/${totalPossivel}`;
+  document.getElementById('res-acertos').textContent = acertosTotais;
+  document.getElementById('res-erros').textContent = errosTotais;
+  document.getElementById('res-pontos').textContent = `${pct}%`;
+
+  let cls, icone, titulo, sub, msg;
+  if (pct >= 70) {
+    cls = 'aprovado'; icone = '🎯'; titulo = 'Simulação Aprovada!';
+    sub = 'Desempenho registrado. Encaminhe para revisão do gestor.';
+    msg = `<strong>${nomeColaborador}</strong>, você demonstrou segurança nas decisões de atendimento ao longo dos 15 casos. Seu raciocínio está alinhado com os protocolos da rede. O gestor vai revisar as fases de escrita livre e definir os próximos passos da sua trilha. Bem-vindo(a) à equipe!`;
+  } else if (pct >= 50) {
+    cls = 'medio'; icone = '📋'; titulo = 'Resultado Regular';
+    sub = 'Ainda há pontos para reforçar antes de atender franqueados.';
+    msg = `<strong>${nomeColaborador}</strong>, você passou pela simulação, mas há decisões que precisam ser revisadas. O gestor vai analisar os casos com menor pontuação e pode indicar módulos específicos para reler. Não desanime — o simulador existe exatamente para isso!`;
+  } else {
+    cls = 'reprovado'; icone = '📚'; titulo = 'Precisa Reforçar';
+    sub = 'Releia os manuais e refaça o simulador.';
+    msg = `<strong>${nomeColaborador}</strong>, o resultado indica que alguns conceitos precisam ser consolidados antes de avançar. O gestor vai identificar os módulos prioritários para revisão. Refaça o simulador após o reforço — você chega lá!`;
+  }
+
+  document.getElementById('res-icone').textContent = icone;
+  document.getElementById('res-titulo').textContent = titulo;
+  document.getElementById('res-sub').textContent = sub;
+  document.getElementById('res-nota').className = `nota-grande ${cls}`;
+  document.getElementById('res-pill').textContent = cls === 'aprovado' ? '✓ Aprovado(a)' : cls === 'medio' ? '⚠ Regular' : '✗ Reforço necessário';
+  document.getElementById('res-pill').className = cls;
+  document.getElementById('msg-gestor').innerHTML = msg;
+
+  const lista = document.getElementById('breakdown-lista');
+  lista.innerHTML = '';
+  resultadosPorCaso.forEach((r, i) => {
+    const linha = document.createElement('div');
+    linha.className = 'caso-linha';
+    const stars = [0,1,2].map(j => `<div class="star ${j < r.acertos ? 'cheia' : 'vazia'}"></div>`).join('');
+    linha.innerHTML = `
+      <div class="caso-nome">Caso ${i+1} — ${r.nome.split(' ').slice(0,2).join(' ')}</div>
+      <div class="caso-stars">${stars}</div>
+      <div class="pontos-caso">${r.pontos}/30</div>`;
+    lista.appendChild(linha);
+  });
+
+  try {
+    const chave = 'cresci_simulador_resultados';
+    const ex = JSON.parse(localStorage.getItem(chave) || '[]');
+    ex.push({
+      nome: nomeColaborador,
+      data: new Date().toISOString(),
+      pontos: pontosTotais,
+      total_possivel: totalPossivel,
+      acertos: acertosTotais,
+      erros: errosTotais,
+      percentual: pct,
+      por_caso: resultadosPorCaso
+    });
+    localStorage.setItem(chave, JSON.stringify(ex));
+  } catch(e) {}
+}
+</script>
+</body>
+</html>
